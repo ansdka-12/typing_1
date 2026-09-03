@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>실시간 타자 연습 현황판</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 30px auto; padding: 20px; }
+    .summary-box { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px; font-size: 16px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
+    th { background-color: #f1f5f9; color: #334155; }
+    .status-in-progress { color: #d97706; font-weight: bold; background-color: #fffbeb; }
+    .status-complete { color: #16a34a; font-weight: bold; background-color: #f0fdf4; }
+  </style>
+</head>
+<body>
+  <h2>실시간 학생 타자 연습 현황판</h2>
+  
+  <div class="summary-box">
+    <strong>진행 중: </strong><span id="activeCount" style="color: #d97706;">0</span>명 | 
+    <strong>완료: </strong><span id="completeCount" style="color: #16a34a;">0</span>명
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>순위</th>
+        <th>이름/학번</th>
+        <th>상태</th>
+        <th>타수 (CPM)</th>
+      </tr>
+    </thead>
+    <tbody id="recordTable">
+    </tbody>
+  </table>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCbD3IZgib2KCETLMqP2zMH2_WVVdxfsmk",
+      authDomain: "test-26-01-20.firebaseapp.com",
+      projectId: "test-26-01-20",
+      storageBucket: "test-26-01-20.firebasestorage.app",
+      messagingSenderId: "1046847215998",
+      appId: "1:1046847215998:web:f9ce56e45c28c4e61f7b2f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const q = query(collection(db, "typing_records"), orderBy("cpm", "desc"));
+
+    onSnapshot(q, (snapshot) => {
+      const tbody = document.getElementById("recordTable");
+      tbody.innerHTML = "";
+
+      let active = 0;
+      let complete = 0;
+      let rank = 1;
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.status === "진행 중") active++;
+        if (data.status === "완료") complete++;
+
+        const tr = document.createElement("tr");
+        const statusClass = data.status === "완료" ? "status-complete" : "status-in-progress";
+
+        tr.innerHTML = `
+          <td>${data.status === '완료' ? rank++ : '-'}</td>
+          <td>${data.name}</td>
+          <td class="${statusClass}">${data.status}</td>
+          <td>${data.cpm ? data.cpm + ' CPM' : '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById("activeCount").innerText = active;
+      document.getElementById("completeCount").innerText = complete;
+    });
+  </script>
+</body>
+</html>
