@@ -1,642 +1,223 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>C 타자 연습 - 고정형</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#f8fafc;color:#0f172a}
-.mono{font-family:Consolas, 'Courier New', Monaco, monospace !important}
-header{background:white;border-bottom:2px solid #e2e8f0;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50}
-.badge{background:#0f172a;color:white;padding:3px 10px;border-radius:20px;font-size:11px;margin-right:8px}
-.layout{display:flex;height:calc(100vh - 56px)}
-.sidebar{width:240px;background:white;border-right:1px solid #e2e8f0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px}
-.side-item{padding:10px 12px;border-radius:10px;border:1px solid #e2e8f0;cursor:pointer;background:white}
-.side-item.active{background:#eff6ff;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
-.side-item.disabled{opacity:0.5;cursor:not-allowed}
-.side-item .pg{font-size:10px;color:#64748b;font-weight:700}
-.side-item .tt{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;position:relative}
-.main-content{flex:1}
-.status-bar{height:54px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;padding:0 16px}
-.status-left{display:flex}
-.s-item{padding:0 14px;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;min-width:90px}
-.s-label{font-size:10px;color:#94a3b8;font-weight:800}
-.s-value{font-size:19px;font-weight:800}
-.s-value.time{font-size:22px}
-.status-right{display:flex;gap:6px}
-.btn{height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:white;font-size:12px;font-weight:600;cursor:pointer}
-.btn-primary{background:#0f172a;color:white;border-color:#0f172a}
-.pill{font-size:11px;padding:4px 10px;border-radius:20px;background:#eff6ff;border:1px solid #dbeafe;color:#2563eb;font-weight:700}
-.current-card{margin:16px;background:white;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
-.card-hd{padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:12px;font-weight:700}
-
-.target-line{padding:18px 20px;font-size:18px;line-height:1.8;white-space:pre-wrap;word-break:break-all;min-height:68px;font-weight:700}
-.ok{color:#0f766e;background:#ccfbf1;font-weight:800}
-.ng{color:#dc2626;background:#fee2e2;font-weight:800}
-.cur{background:#3b82f6;color:white;font-weight:800}
-
-.input-area{margin:0 16px 16px 16px;background:white;border:2px solid #cbd5e1;border-radius:12px;overflow:hidden}
-.input-area textarea{width:100%;min-height:64px;border:none;outline:none;padding:14px 16px;font-size:16px;font-family:Consolas, 'Courier New', monospace;resize:none}
-
-.kbd-wrap{margin:16px;background:white;border:2px solid #e2e8f0;border-radius:16px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.06);position:sticky;bottom:0;z-index:40}
-.kbd-rows{display:flex;flex-direction:column;gap:6px;align-items:center}
-.kbd-row{display:flex;gap:6px;justify-content:center}
-.key{min-width:46px;height:52px;border-radius:8px;border:2px solid #e2e8f0;background:white;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#334155;box-shadow:0 3px 8px rgba(0,0,0,.12);transition:.12s}
-.key.active{background:#2563eb;border-color:#2563eb;color:white;transform:scale(1.08);box-shadow:0 0 0 4px rgba(37,99,235,.3)}
-.key.shift-active{background:#f59e0b;border-color:#f59e0b;color:white}
-.key.space{width:380px}
-.key.special{background:#f1f5f9;font-size:11px}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
-.modal.open{display:flex}
-.modal-box{background:white;border-radius:16px;max-width:720px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid #e2e8f0}
-.modal-hd{height:48px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;padding:0 16px;font-weight:700}
-.modal-body pre{padding:20px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-all;user-select:none;-webkit-user-select:none;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#0f172a;color:white;padding:10px 16px;border-radius:12px;font-size:13px;display:none;z-index:200}
-
-#full-ref{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;font-family:Consolas, 'Courier New', monospace;font-size:18px;font-weight:700;line-height:1.6;white-space:pre-wrap;max-height:180px;overflow:auto;color:#1e293b}
-.full-editor-container{position:relative;margin-top:10px;border-radius:12px;border:2px solid #cbd5e1;background:white;overflow:hidden}
-#full-editor-display{min-height:180px;max-height:200px;padding:12px;font-family:Consolas, 'Courier New', monospace;font-size:16px;font-weight:600;line-height:1.6;white-space:pre-wrap;word-break:break-all;overflow-y:auto}
-#full-editor-display .placeholder{color:#94a3b8;font-style:italic;font-weight:400}
-#full-hidden-input{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:text;resize:none;font-family:Consolas, 'Courier New', monospace}
-
-.reset-modal-body{padding:24px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center}
-.reset-opt-btn{width:100%;padding:14px;border-radius:10px;border:1px solid #cbd5e1;background:white;font-size:15px;font-weight:700;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.reset-opt-btn:hover{background:#f1f5f9;border-color:#94a3b8}
-.reset-opt-btn.primary{background:#0f172a;color:white;border-color:#0f172a}
-.reset-opt-btn.primary:hover{background:#1e293b}
-
-#fx-canvas{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:999}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>타자 연습</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f1f5f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      width: 550px;
+      text-align: center;
+    }
+    .user-info {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1e293b;
+      margin-bottom: 25px;
+      background: #e2e8f0;
+      padding: 12px;
+      border-radius: 8px;
+    }
+    .target-text {
+      font-size: 22px;
+      font-weight: bold;
+      color: #0f172a;
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      margin-bottom: 25px;
+      letter-spacing: 1px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border: 2px solid #94a3b8;
+      border-radius: 8px;
+      box-sizing: border-box;
+      outline: none;
+      text-align: center;
+    }
+    input[type="text"]:focus {
+      border-color: #2563eb;
+    }
+    .stats {
+      margin-top: 25px;
+      display: flex;
+      justify-content: space-around;
+      font-size: 18px;
+      font-weight: bold;
+      color: #475569;
+    }
+    .result-box {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-<canvas id="fx-canvas"></canvas>
-<header><div><span class="badge">C</span><span id="title" style="font-weight:800">Hello World 출력</span><span id="pageBadge" style="margin-left:8px;background:#e2e8f0;padding:2px 8px;border-radius:12px;font-size:11px">p.65</span></div><div style="font-size:11px;color:#64748b">키보드·목록 고정형</div></header>
-<div class="layout">
-<div class="sidebar" id="sidebar">
-<div class="side-item active" data-idx="0"><div class="pg">p.65 · 작성 예</div><div class="tt">Hello World 출력</div></div>
-<div class="side-item" data-idx="1"><div class="pg">p.67 · 작성 예</div><div class="tt">변수 선언</div></div>
-<div class="side-item" data-idx="2"><div class="pg">p.68 · 작성 예</div><div class="tt">자료형 크기 확인</div></div>
-<div class="side-item" data-idx="3"><div class="pg">p.69 · 작성 예</div><div class="tt">변수 할당과 출력</div></div>
-<div class="side-item" data-idx="4"><div class="pg">p.72 · 작성 예</div><div class="tt">배열 기초 - 메달 집계</div></div>
-<div class="side-item" data-idx="5"><div class="pg">p.74 · 작성 예</div><div class="tt">2차원 배열 - 좌석 예약</div></div>
-<div class="side-item" data-idx="6"><div class="pg">p.77 · 작성 예</div><div class="tt">포인터와 배열</div></div>
-<div class="side-item" data-idx="7"><div class="pg">p.78 · 작성 예</div><div class="tt">두 변수 교환 swap</div></div>
-<div class="side-item" data-idx="8"><div class="pg">p.82 · 작성 예</div><div class="tt">printf 서식 지정자</div></div>
-<div class="side-item" data-idx="9"><div class="pg">p.83 · 작성 예</div><div class="tt">putchar, puts 함수</div></div>
-<div class="side-item" data-idx="10"><div class="pg">p.85 · 스스로 해보기</div><div class="tt">시간표 출력하기</div></div>
-<div class="side-item" data-idx="11"><div class="pg">p.86 · 작성 예</div><div class="tt">scanf 정수 입력</div></div>
-<div class="side-item" data-idx="12"><div class="pg">p.87 · 스스로 해보기</div><div class="tt">scanf 문자와 문자열</div></div>
-<div class="side-item" data-idx="13"><div class="pg">p.90 · 작성 예</div><div class="tt">산술 연산자</div></div>
-<div class="side-item" data-idx="14"><div class="pg">p.94 · 작성 예</div><div class="tt">파일 쓰기 fprintf</div></div>
-<div class="side-item" data-idx="15"><div class="pg">p.95 · 작성 예</div><div class="tt">파일 읽기 fscanf</div></div>
-<div class="side-item" data-idx="16"><div class="pg">p.96 · 작성 예</div><div class="tt">파일 복사 fgetc fputc</div></div>
-<div class="side-item" data-idx="17"><div class="pg">p.97 · 작성 예</div><div class="tt">줄 단위 입출력 fgets fputs</div></div>
-<div class="side-item" data-idx="18"><div class="pg">p.98 · 스스로 해보기</div><div class="tt">파일에 5줄 쓰기</div></div>
-<div class="side-item" data-idx="19"><div class="pg">p.104 · 작성 예</div><div class="tt">if문 홀짝 판별</div></div>
-<div class="side-item" data-idx="20"><div class="pg">p.105 · 작성 예</div><div class="tt">if-else 학점 계산</div></div>
-<div class="side-item" data-idx="21"><div class="pg">p.106 · 스스로 해보기</div><div class="tt">중첩 if 로그인</div></div>
-<div class="side-item" data-idx="22"><div class="pg">p.107 · 작성 예</div><div class="tt">switch 계절 판별</div></div>
-<div class="side-item" data-idx="23"><div class="pg">p.108 · 작성 예</div><div class="tt">switch 계산기</div></div>
-<div class="side-item" data-idx="24"><div class="pg">p.109 · 스스로 해보기</div><div class="tt">switch 메뉴 선택</div></div>
-<div class="side-item" data-idx="25"><div class="pg">p.110 · 작성 예</div><div class="tt">for문 구구단</div></div>
-<div class="side-item" data-idx="26"><div class="pg">p.111 · 작성 예</div><div class="tt">for문 별찍기</div></div>
-<div class="side-item" data-idx="27"><div class="pg">p.112 · 스스로 해보기</div><div class="tt">중첩 for 구구단 전체</div></div>
-<div class="side-item" data-idx="28"><div class="pg">p.113 · 작성 예</div><div class="tt">while 합계 구하기</div></div>
-<div class="side-item" data-idx="29"><div class="pg">p.114 · 작성 예</div><div class="tt">do-while 메뉴 반복</div></div>
-<div class="side-item" data-idx="30"><div class="pg">p.115 · 작성 예</div><div class="tt">break continue 활용</div></div>
-<div class="side-item" data-idx="31"><div class="pg">p.116 · 스스로 해보기</div><div class="tt">합이 100 넘는 순간</div></div>
-<div class="side-item" data-idx="32"><div class="pg">p.117 · 작성 예</div><div class="tt">중첩 반복문 좌표</div></div>
-<div class="side-item" data-idx="33"><div class="pg">p.118 · 스스로 해보기</div><div class="tt">무한루프와 q 탈출</div></div>
-<div class="side-item" data-idx="34"><div class="pg">p.121 · 작성 예</div><div class="tt">함수 정의와 호출</div></div>
-<div class="side-item" data-idx="35"><div class="pg">p.124 · 작성 예</div><div class="tt">매개변수와 반환값</div></div>
-<div class="side-item" data-idx="36"><div class="pg">p.125 · 작성 예</div><div class="tt">재귀함수 팩토리얼</div></div>
-<div class="side-item" data-idx="37"><div class="pg">p.126 · 스스로 해보기</div><div class="tt">포인터로 값 교환</div></div>
-<div class="side-item" data-idx="38"><div class="pg">p.127 · 작성 예</div><div class="tt">배열을 함수에 전달</div></div>
-<div class="side-item" data-idx="39"><div class="pg">p.130 · 작성 예</div><div class="tt">문자열 함수 활용</div></div>
-<div class="side-item" data-idx="40"><div class="pg">p.131 · 작성 예</div><div class="tt">포인터 반환 함수</div></div>
-<div class="side-item" data-idx="41"><div class="pg">p.132 · 스스로 해보기</div><div class="tt">제곱과 세제곱 함수</div></div>
-<div class="side-item" data-idx="42"><div class="pg">p.140 · 작성 예</div><div class="tt">파일 열기 닫기 확인</div></div>
-<div class="side-item" data-idx="43"><div class="pg">p.141 · 작성 예</div><div class="tt">텍스트 파일 쓰기</div></div>
-<div class="side-item" data-idx="44"><div class="pg">p.142 · 작성 예</div><div class="tt">텍스트 파일 읽기</div></div>
-<div class="side-item" data-idx="45"><div class="pg">p.143 · 작성 예</div><div class="tt">이진 파일 입출력</div></div>
-<div class="side-item" data-idx="46"><div class="pg">p.144 · 작성 예</div><div class="tt">파일 위치 제어</div></div>
-<div class="side-item" data-idx="47"><div class="pg">p.145 · 스스로 해보기</div><div class="tt">성적 파일 평균 구하기</div></div>
-<div class="side-item" data-idx="48"><div class="pg">p.146 · 작성 예</div><div class="tt">파일 복사 완성</div></div>
-<div class="side-item" data-idx="49"><div class="pg">p.147 · 스스로 해보기</div><div class="tt">로그 파일 이어쓰기</div></div>
-<div class="side-item" data-idx="50"><div class="pg">p.148 · 스스로 해보기</div><div class="tt">주소록 저장 종합</div></div>
-</div>
 
-<div class="main">
-<div class="main-content">
-<div class="status-bar">
-<div class="status-left">
-<div class="s-item"><div class="s-label">⏱️ 시간</div><div class="s-value time mono" id="s-time">0:00</div></div>
-<div class="s-item"><div class="s-label">🎯 정확도</div><div class="s-value mono" id="s-acc">100%</div></div>
-<div class="s-item"><div class="s-label">⌨️ 타수</div><div class="s-value mono" id="s-typed">0</div></div>
-<div class="s-item"><div class="s-label">⚡ 타자 속도</div><div class="s-value mono" id="s-cpm" style="color:#2563eb">0</div></div>
-<div class="s-item"><div class="s-label">⚠️ 오타</div><div class="s-value mono" id="s-err" style="color:#ef4444">0</div></div>
-</div>
-<div class="status-right">
-<button class="btn" id="btn-original">👁️ 원본 보기</button>
-<button class="btn" id="btn-kbd">⌨️ ON</button>
-<span class="pill" id="s-wpm">0 WPM</span>
-<span class="pill" id="s-progress">1 / 6</span>
-</div>
-</div>
-<div style="height:6px;background:#f1f5f9;border-bottom:1px solid #e2e8f0"><div id="line-progress" style="height:100%;width:16%;background:linear-gradient(90deg,#3b82f6,#14b8a6)"></div></div>
+  <div class="container">
+    <div class="user-info" id="studentDisplay">학생 정보 확인 중...</div>
+    
+    <div class="target-text" id="targetText">동해물과 백두산이 마르고 닳도록</div>
 
-<!-- 한 줄 모드 -->
-<div id="line-mode">
-<div class="current-card"><div class="card-hd"><span>현재 줄 <span id="cur-line-no" class="mono">1 / 6</span></span><span id="line-acc" class="pill" style="background:#ecfdf5">100%</span></div><div class="target-line mono" id="target-line"></div></div>
-<div style="padding:0 16px 4px 16px;font-size:11px;color:#64748b;font-weight:700">타자 입력 (엔터키를 누르면 다음 줄로 이동합니다) <span style="float:right" class="mono" id="char-count">0 / 18</span></div>
-<div class="input-area"><textarea id="input" placeholder="현재 줄을 타이핑한 후 Enter를 누르세요" spellcheck="false"></textarea></div>
-</div>
+    <input type="text" id="inputField" placeholder="위 문장을 똑같이 입력하고 Enter를 누르세요" autocomplete="off">
 
-<!-- 전체 모드 -->
-<div id="full-mode" style="display:none;padding:16px">
-<div style="font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px">샘플 코드 (실시간 오타 체크)</div>
-<div id="full-ref" class="mono"></div>
-
-<div style="font-size:11px;color:#64748b;font-weight:700;margin-top:12px;margin-bottom:6px">전체 코드 타자 입력란</div>
-<div class="full-editor-container">
-  <div id="full-editor-display" class="mono"></div>
-  <textarea id="full-hidden-input" spellcheck="false"></textarea>
-</div>
-<div style="margin-top:10px;display:flex;gap:8px;align-items:center">
-  <span id="full-done" style="display:none;background:#14b8a6;color:white;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700">완료! 🎉 (Enter 키를 누르면 다음 진행 선택)</span>
-</div>
-</div>
-</div>
-
-<div class="kbd-wrap" id="kbd-wrap">
-<div style="font-size:14px;font-weight:800;margin-bottom:10px">⌨️ 가상 키보드 - 다음 키가 파란색으로 표시됩니다</div>
-<div class="kbd-rows" id="kbd">
-<div class="kbd-row"><div class="key" data-base="`">`</div><div class="key" data-base="1">1</div><div class="key" data-base="2">2</div><div class="key" data-base="3">3</div><div class="key" data-base="4">4</div><div class="key" data-base="5">5</div><div class="key" data-base="6">6</div><div class="key" data-base="7">7</div><div class="key" data-base="8">8</div><div class="key" data-base="9">9</div><div class="key" data-base="0">0</div><div class="key" data-base="-">-</div><div class="key" data-base="=">=</div><div class="key special" data-base="Backspace" style="width:90px">Backspace</div></div>
-<div class="kbd-row"><div class="key special" data-base="Tab" style="width:90px">Tab</div><div class="key" data-base="q">q</div><div class="key" data-base="w">w</div><div class="key" data-base="e">e</div><div class="key" data-base="r">r</div><div class="key" data-base="t">t</div><div class="key" data-base="y">y</div><div class="key" data-base="u">u</div><div class="key" data-base="i">i</div><div class="key" data-base="o">o</div><div class="key" data-base="p">p</div><div class="key" data-base="[">[</div><div class="key" data-base="]">]</div><div class="key" data-base="\">\</div></div>
-<div class="kbd-row"><div class="key special" data-base="Caps" style="width:90px">Caps</div><div class="key" data-base="a">a</div><div class="key" data-base="s">s</div><div class="key" data-base="d">d</div><div class="key" data-base="f">f</div><div class="key" data-base="g">g</div><div class="key" data-base="h">h</div><div class="key" data-base="j">j</div><div class="key" data-base="k">k</div><div class="key" data-base="l">l</div><div class="key" data-base=";">;</div><div class="key" data-base="'">'</div><div class="key special" data-base="Enter" style="width:90px">Enter</div></div>
-<div class="kbd-row"><div class="key special" data-base="ShiftL" style="width:90px">Shift</div><div class="key" data-base="z">z</div><div class="key" data-base="x">x</div><div class="key" data-base="c">c</div><div class="key" data-base="v">v</div><div class="key" data-base="b">b</div><div class="key" data-base="n">n</div><div class="key" data-base="m">m</div><div class="key" data-base=",">,</div><div class="key" data-base=".">.</div><div class="key" data-base="/">/</div><div class="key special" data-base="ShiftR" style="width:90px">Shift</div></div>
-<div class="kbd-row"><div class="key special" data-base="Ctrl">Ctrl</div><div class="key special" data-base="Alt">Alt</div><div class="key space" data-base=" " style="width:380px">Space</div><div class="key special" data-base="AltR">Alt</div><div class="key special" data-base="CtrlR">Ctrl</div></div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- 코드 모달 -->
-<div class="modal" id="modal"><div class="modal-box"><div class="modal-hd"><span>👁️ 원본 보기 - 복사 방지</span><button class="btn" id="modal-close">✕ 닫기</button></div><div style="background:#fffbeb;padding:8px 16px;font-size:11px;color:#92400e">🔒 복사 방지</div><div class="modal-body"><pre id="modal-code" class="mono" style="user-select:none;-webkit-user-select:none" oncopy="return false" oncut="return false" oncontextmenu="return false"></pre></div></div></div>
-
-<!-- 완료 후 다음 동작 선택 모달 -->
-<div class="modal" id="reset-modal">
-  <div class="modal-box" style="max-width:380px;">
-    <div class="modal-hd">
-      <span>🎉 연습 완료 및 다음 선택</span>
-      <button class="btn" id="reset-modal-close">✕</button>
+    <div class="stats">
+      <div>현재 타수: <span id="cpmDisplay">0</span> CPM</div>
+      <div>경과 시간: <span id="timerDisplay">0</span>초</div>
     </div>
-    <div class="reset-modal-body">
-      <p style="font-size:13px;color:#64748b;margin-bottom:8px">목록 이동이 해제되었습니다. 다음 작업을 선택하세요.</p>
-      <button class="reset-opt-btn primary" id="opt-restart-line">📝 현재 과제 한 줄 모드로 재도전</button>
-      <button class="reset-opt-btn" id="opt-restart-full">📄 현재 과제 전체 모드로 재도전</button>
+
+    <div class="result-box" id="resultBox">
+      🎉 연습이 완료되었습니다! 기록이 교사 현황판으로 전송되었습니다.
     </div>
   </div>
-</div>
 
-<!-- 목록 변경 제한 경고 모달 (화면 중앙) -->
-<div class="modal" id="warn-modal">
-  <div class="modal-box" style="max-width:400px;">
-    <div class="modal-hd">
-      <span style="color:#ef4444">⚠️ 목록 변경 불가</span>
-      <button class="btn" id="warn-modal-x">✕</button>
-    </div>
-    <div class="reset-modal-body">
-      <div style="font-size:40px;margin-bottom:4px">🔒</div>
-      <p style="font-size:14px;font-weight:700;color:#0f172a">연습 진행 중에는 목록을 변경할 수 없습니다!</p>
-      <p style="font-size:12.5px;color:#64748b;line-height:1.5">한 줄 모드와 전체 코드 작성을 <b>모두 완료</b>해야만 다른 목록으로 이동할 수 있습니다.</p>
-      <button class="reset-opt-btn primary" id="warn-modal-ok" style="margin-top:8px">확인 (계속 연습하기)</button>
-    </div>
-  </div>
-</div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-<div class="toast" id="toast"></div>
+    // 1. Firebase 설정
+    const firebaseConfig = {
+      apiKey: "AIzaSyCbD3IZgib2KCETLMqP2zMH2_WVVdxfsmk",
+      authDomain: "test-26-01-20.firebaseapp.com",
+      projectId: "test-26-01-20",
+      storageBucket: "test-26-01-20.firebasestorage.app",
+      messagingSenderId: "1046847215998",
+      appId: "1:1046847215998:web:f9ce56e45c28c4e61f7b2f"
+    };
 
-<script>
-const lessons = [
-  {"page": 65, "title": "Hello World 출력", "type": "작성 예", "desc": "첫 C 프로그램, 화면에 문자열 출력", "code": `#include <stdio.h>\nint main()\n{\n    printf("Hello, World! \\n");\n    return 0;\n}`},
-  {"page": 67, "title": "변수 선언", "type": "작성 예", "desc": "정수형과 문자형 변수 선언하기", "code": `#include <stdio.h>\nint main()\n{\n    int num1;\n    int num2, num3;\n    char ch;\n    return 0;\n}`},
-  {"page": 68, "title": "자료형 크기 확인", "type": "작성 예", "desc": "sizeof 연산자로 자료형 크기 알아보기", "code": `#include <stdio.h>\nint main()\n{\n    printf("1)정수형 int: %d, short: %d, long: %d \\n", sizeof(int), sizeof(short), sizeof(long));\n    printf("2)실수형 float: %d, double: %d \\n", sizeof(float), sizeof(double));\n    printf("3)문자형 char: %d \\n", sizeof(char));\n    return 0;\n}`},
-  {"page": 69, "title": "변수 할당과 출력", "type": "작성 예", "desc": "변수에 값을 대입하고 printf로 확인", "code": `#include <stdio.h>\nint main()\n{\n    int num1 = 10;\n    int num2, num3;\n    num2 = 20;\n    num3 = 30;\n    char ch;\n    ch = 'A';\n    printf("num1 값: %d \\n", num1);\n    printf("num2 값: %d, num3 값: %d \\n", num2, num3);\n    printf("ch값: %c \\n", ch);\n    return 0;\n}`},
-  {"page": 72, "title": "배열 기초 - 메달 집계", "type": "작성 예", "desc": "1차원 배열 선언과 인덱스 접근", "code": `#include <stdio.h>\nint main()\n{\n    int medal[5] = {13, 10, 8, 5, 3};\n    printf("1위 총 메달 개수: %d \\n", medal[0]);\n    printf("2위 총 메달 개수: %d \\n", medal[1]);\n    printf("3위 총 메달 개수: %d \\n", medal[2]);\n    printf("4위 총 메달 개수: %d \\n", medal[3]);\n    printf("5위 총 메달 개수: %d \\n", medal[4]);\n    return 0;\n}`},
-  {"page": 74, "title": "2차원 배열 - 좌석 예약", "type": "작성 예", "desc": "2차원 배열로 좌석 현황 표시", "code": `#include <stdio.h>\nint main()\n{\n    char seats[2][5] = {'-', '-', '-', '-', '-', '-', '-', '-', '-', '-'};\n    seats[0][1] = 'A';\n    seats[1][2] = 'B';\n    seats[0][4] = 'C';\n    printf("[좌석 예약 현황]\\n");\n    printf("%c %c %c %c %c\\n", seats[0][0], seats[0][1], seats[0][2], seats[0][3], seats[0][4]);\n    printf("%c %c %c %c %c\\n", seats[1][0], seats[1][1], seats[1][2], seats[1][3], seats[1][4]);\n    return 0;\n}`},
-  {"page": 77, "title": "포인터와 배열", "type": "작성 예", "desc": "포인터로 배열 원소에 접근하기", "code": `#include <stdio.h>\nint main() {\n    int num[2] = {1, 2};\n    int *p;\n    p = num;\n    printf("배열을 이용하여 값에 접근:\\n");\n    printf("num[0] = %d\\n", num[0]);\n    printf("num[1] = %d\\n", num[1]);\n    printf("\\n포인터를 이용하여 값에 접근:\\n");\n    printf("*(p + 0) = %d\\n", *(p + 0));\n    printf("*(p + 1) = %d\\n", *(p + 1));\n    return 0;\n}`},
-  {"page": 78, "title": "두 변수 교환 swap", "type": "작성 예", "desc": "임시 변수를 이용한 값 교환", "code": `#include <stdio.h>\nint main()\n{\n    int a = 1, b = 2;\n    int tmp;\n    printf("a: %d  b: %d\\n", a, b);\n    tmp = a;\n    a = b;\n    b = tmp;\n    printf("a: %d  b: %d\\n", a, b);\n    return 0;\n}`},
-  {"page": 82, "title": "printf 서식 지정자", "type": "작성 예", "desc": "정수, 실수, 문자, 문자열 출력 서식", "code": `#include <stdio.h>\nint main() {\n    int num = 42;\n    float pi = 3.141592;\n    char ch = 'A';\n    char str[] = "Hello, World!";\n    printf("정수: %d\\n", num);\n    printf("실수: %.2f\\n", pi);\n    printf("문자: %c\\n", ch);\n    printf("문자열: %s\\n", str);\n    return 0;\n}`},
-  {"page": 83, "title": "putchar, puts 함수", "type": "작성 예", "desc": "문자 단위, 문자열 단위 출력 함수", "code": `#include <stdio.h>\nint main() {\n    char ch = 'A';\n    char str[] = "Hello, C!";\n    putchar(ch);\n    putchar('\\n');\n    puts(str);\n    return 0;\n}`},
-  {"page": 85, "title": "시간표 출력하기", "type": "스스로 해보기", "desc": "\\t로 칸을 맞춰 시간표 만들기", "code": `#include <stdio.h>\nint main() {\n    printf("\\t월\\t화\\t수\\t목\\t금\\n");\n    printf("1교시\\t국사\\t영어\\t과학\\t국어\\t영어\\n");\n    printf("2교시\\t음악\\t수학\\t국어\\t과학\\t체육\\n");\n    printf("3교시\\t과학\\t정보\\t수학\\t사회\\t기가\\n");\n    printf("4교시\\t체육\\t진로\\t영어\\t음악\\t과학\\n");\n    return 0;\n}`},
-  {"page": 86, "title": "scanf 정수 입력", "type": "작성 예", "desc": "사용자로부터 정수 입력받기", "code": `#include <stdio.h>\nint main() {\n    int age;\n    printf("나이를 입력하세요: ");\n    scanf("%d", &age);\n    printf("당신의 나이는 %d세 입니다.\\n", age);\n    return 0;\n}`},
-  {"page": 87, "title": "scanf 문자와 문자열", "type": "스스로 해보기", "desc": "문자, 문자열 입력받기", "code": `#include <stdio.h>\nint main() {\n    char ch;\n    char name[20];\n    printf("문자 입력: ");\n    scanf(" %c", &ch);\n    printf("이름 입력: ");\n    scanf("%s", name);\n    printf("입력한 문자: %c, 이름: %s\\n", ch, name);\n    return 0;\n}`},
-  {"page": 90, "title": "산술 연산자", "type": "작성 예", "desc": "+, -, *, /, % 연산자 연습", "code": `#include <stdio.h>\nint main() {\n    int a = 10, b = 3;\n    printf("a + b = %d\\n", a + b);\n    printf("a - b = %d\\n", a - b);\n    printf("a * b = %d\\n", a * b);\n    printf("a / b = %d\\n", a / b);\n    printf("a %% b = %d\\n", a % b);\n    return 0;\n}`},
-  {"page": 94, "title": "파일 쓰기 fprintf", "type": "작성 예", "desc": "파일에 서식 지정 출력", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("score.txt", "w");\n    char name[20] = "Kim";\n    int point = 95;\n    if (f != NULL) {\n        fprintf(f, "%s %d", name, point);\n        fclose(f);\n    }\n    return 0;\n}`},
-  {"page": 95, "title": "파일 읽기 fscanf", "type": "작성 예", "desc": "파일에서 서식 지정 입력", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("score.txt", "r");\n    char name[20];\n    int point;\n    if (f != NULL) {\n        fscanf(f, "%s %d", name, &point);\n        printf("이름: %s, 점수: %d\\n", name, point);\n        fclose(f);\n    }\n    return 0;\n}`},
-  {"page": 96, "title": "파일 복사 fgetc fputc", "type": "작성 예", "desc": "한 글자씩 읽고 쓰며 파일 복사", "code": `#include <stdio.h>\nint main() {\n    FILE *src = fopen("input.txt", "r");\n    FILE *dst = fopen("output.txt", "w");\n    char ch;\n    if (src != NULL && dst != NULL) {\n        while ((ch = fgetc(src)) != EOF) {\n            fputc(ch, dst);\n        }\n        fclose(src);\n        fclose(dst);\n    }\n    return 0;\n}`},
-  {"page": 97, "title": "줄 단위 입출력 fgets fputs", "type": "작성 예", "desc": "문자열 단위 파일 입출력", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("memo.txt", "w");\n    char str[100] = "Hello, File IO!";\n    if (f != NULL) {\n        fputs(str, f);\n        fclose(f);\n    }\n    FILE *r = fopen("memo.txt", "r");\n    char buffer[100];\n    if (r != NULL) {\n        fgets(buffer, 100, r);\n        printf("%s\\n", buffer);\n        fclose(r);\n    }\n    return 0;\n}`},
-  {"page": 98, "title": "파일에 5줄 쓰기", "type": "스스로 해보기", "desc": "for문과 fprintf로 여러 줄 쓰기", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("data.txt", "w");\n    int i;\n    for (i = 1; i <= 5; i++) {\n        fprintf(f, "%d번째 줄입니다.\\n", i);\n    }\n    fclose(f);\n    return 0;\n}`},
-  {"page": 104, "title": "if문 홀짝 판별", "type": "작성 예", "desc": "나머지 연산과 if문", "code": `#include <stdio.h>\nint main() {\n    int num;\n    printf("정수 입력: ");\n    scanf("%d", &num);\n    if (num % 2 == 0) {\n        printf("%d는 짝수입니다.\\n", num);\n    }\n    if (num % 2 != 0) {\n        printf("%d는 홀수입니다.\\n", num);\n    }\n    return 0;\n}`},
-  {"page": 105, "title": "if-else 학점 계산", "type": "작성 예", "desc": "점수에 따른 학점 판정", "code": `#include <stdio.h>\nint main() {\n    int score;\n    printf("점수 입력: ");\n    scanf("%d", &score);\n    if (score >= 90) {\n        printf("학점: A\\n");\n    } else if (score >= 80) {\n        printf("학점: B\\n");\n    } else if (score >= 70) {\n        printf("학점: C\\n");\n    } else {\n        printf("학점: F\\n");\n    }\n    return 0;\n}`},
-  {"page": 106, "title": "중첩 if 로그인", "type": "스스로 해보기", "desc": "아이디와 비밀번호 이중 검사", "code": `#include <stdio.h>\nint main() {\n    int id = 1234;\n    int pw = 5678;\n    int input_id, input_pw;\n    printf("ID 입력: ");\n    scanf("%d", &input_id);\n    printf("PW 입력: ");\n    scanf("%d", &input_pw);\n    if (input_id == id) {\n        if (input_pw == pw) {\n            printf("로그인 성공!\\n");\n        } else {\n            printf("비밀번호 오류\\n");\n        }\n    } else {\n        printf("아이디 오류\\n");\n    }\n    return 0;\n}`},
-  {"page": 107, "title": "switch 계절 판별", "type": "작성 예", "desc": "월을 입력받아 계절 출력", "code": `#include <stdio.h>\nint main() {\n    int month;\n    printf("월 입력: ");\n    scanf("%d", &month);\n    switch (month) {\n        case 12: case 1: case 2:\n            printf("겨울입니다.\\n");\n            break;\n        case 3: case 4: case 5:\n            printf("봄입니다.\\n");\n            break;\n        case 6: case 7: case 8:\n            printf("여름입니다.\\n");\n            break;\n        default:\n            printf("가을입니다.\\n");\n    }\n    return 0;\n}`},
-  {"page": 108, "title": "switch 계산기", "type": "작성 예", "desc": "연산자 문자에 따라 계산", "code": `#include <stdio.h>\nint main() {\n    char op;\n    int a, b;\n    printf("수식 입력 (예: 3 + 4): ");\n    scanf("%d %c %d", &a, &op, &b);\n    switch (op) {\n        case '+':\n            printf("%d\\n", a + b);\n            break;\n        case '-':\n            printf("%d\\n", a - b);\n            break;\n        case '*':\n            printf("%d\\n", a * b);\n            break;\n        case '/':\n            printf("%d\\n", a / b);\n            break;\n        default:\n            printf("지원하지 않는 연산자\\n");\n    }\n    return 0;\n}`},
-  {"page": 109, "title": "switch 메뉴 선택", "type": "스스로 해보기", "desc": "메뉴 번호에 따른 동작", "code": `#include <stdio.h>\nint main() {\n    printf("[1]파일열기 [2]파일저장 [3]종료\\n");\n    printf("선택: ");\n    scanf("%d", &menu);\n    switch (menu) {\n        case 1:\n            printf("파일을 엽니다.\\n");\n            break;\n        case 2:\n            printf("파일을 저장합니다.\\n");\n            break;\n        case 3:\n            printf("종료합니다.\\n");\n            break;\n        default:\n            printf("잘못된 선택\\n");\n    }\n    return 0;\n}`},
-  {"page": 110, "title": "for문 구구단", "type": "작성 예", "desc": "for 반복문으로 3단 출력", "code": `#include <stdio.h>\nint main() {\n    int i;\n    int dan = 3;\n    for (i = 1; i <= 9; i++) {\n        printf("%d x %d = %d\\n", dan, i, dan * i);\n    }\n    return 0;\n}`},
-  {"page": 111, "title": "for문 별찍기", "type": "작성 예", "desc": "이중 for문으로 삼각형 별 출력", "code": `#include <stdio.h>\nint main() {\n    int i, j;\n    for (i = 1; i <= 5; i++) {\n        for (j = 1; j <= i; j++) {\n            printf("*");\n        }\n        printf("\\n");\n    }\n    return 0;\n}`},
-  {"page": 112, "title": "중첩 for 구구단 전체", "type": "스스로 해보기", "desc": "2~9단 전체 출력", "code": `#include <stdio.h>\nint main() {\n    int dan, i;\n    for (dan = 2; dan <= 9; dan++) {\n        printf("[%d단]\\n", dan);\n        for (i = 1; i <= 9; i++) {\n            printf("%d x %d = %d\\n", dan, i, dan * i);\n        }\n        printf("\\n");\n    }\n    return 0;\n}`},
-  {"page": 113, "title": "while 합계 구하기", "type": "작성 예", "desc": "1부터 100까지 합", "code": `#include <stdio.h>\nint main() {\n    int i = 1;\n    int sum = 0;\n    while (i <= 100) {\n        sum += i;\n        i++;\n    }\n    printf("1부터 100까지 합: %d\\n", sum);\n    return 0;\n}`},
-  {"page": 114, "title": "do-while 메뉴 반복", "type": "작성 예", "desc": "0 입력할 때까지 반복", "code": `#include <stdio.h>\nint main() {\n    int choice;\n    do {\n        printf("[1]시작 [2]설정 [0]종료: ");\n        scanf("%d", &choice);\n        if (choice == 1) printf("게임 시작!\\n");\n        else if (choice == 2) printf("설정 메뉴\\n");\n    } while (choice != 0);\n    printf("프로그램 종료\\n");\n    return 0;\n}`},
-  {"page": 115, "title": "break continue 활용", "type": "작성 예", "desc": "짝수 건너뛰고 7 초과 시 탈출", "code": `#include <stdio.h>\nint main() {\n    int i;\n    for (i = 1; i <= 10; i++) {\n        if (i % 2 == 0) continue;\n        if (i > 7) break;\n        printf("%d ", i);\n    }\n    printf("\\n");\n    return 0;\n}`},
-  {"page": 116, "title": "합이 100 넘는 순간", "type": "스스로 해보기", "desc": "while과 break로 조건 만족 찾기", "code": `#include <stdio.h>\nint main() {\n    int i = 0;\n    int sum = 0;\n    while (1) {\n        i++;\n        sum += i;\n        if (sum > 100) break;\n    }\n    printf("합이 100을 넘을 때 i=%d, sum=%d\\n", i, sum);\n    return 0;\n}`},
-  {"page": 117, "title": "중첩 반복문 좌표", "type": "작성 예", "desc": "이중 반복으로 좌표 출력", "code": `#include <stdio.h>\nint main() {\n    int i, j;\n    for (i = 1; i <= 3; i++) {\n        for (j = 1; j <= 4; j++) {\n            printf("(%d,%d) ", i, j);\n        }\n        printf("\\n");\n    }\n    return 0;\n}`},
-  {"page": 118, "title": "무한루프와 q 탈출", "type": "스스로 해보기", "desc": "q 입력 시 종료", "code": `#include <stdio.h>\nint main() {\n    char ch;\n    while (1) {\n        printf("문자 입력 (q: 종료): ");\n        scanf(" %c", &ch);\n        if (ch == 'q') break;\n        printf("입력한 문자: %c\\n", ch);\n    }\n    return 0;\n}`},
-  {"page": 121, "title": "함수 정의와 호출", "type": "작성 예", "desc": "void 함수 만들기", "code": `#include <stdio.h>\nvoid hello() {\n    printf("안녕하세요!\\n");\n}\nint main() {\n    hello();\n    hello();\n    return 0;\n}`},
-  {"page": 124, "title": "매개변수와 반환값", "type": "작성 예", "desc": "두 수를 더하는 함수", "code": `#include <stdio.h>\nint add(int a, int b) {\n    return a + b;\n}\nint main() {\n    int result = add(10, 20);\n    printf("10 + 20 = %d\\n", result);\n    return 0;\n}`},
-  {"page": 125, "title": "재귀함수 팩토리얼", "type": "작성 예", "desc": "자기 자신을 호출하는 함수", "code": `#include <stdio.h>\nint factorial(int n) {\n    if (n <= 1) return 1;\n    return n * factorial(n - 1);\n}\nint main() {\n    int n = 5;\n    printf("%d! = %d\\n", n, factorial(n));\n    return 0;\n}`},
-  {"page": 126, "title": "포인터로 값 교환", "type": "스스로 해보기", "desc": "참조에 의한 호출", "code": `#include <stdio.h>\nvoid swap(int *a, int *b) {\n    int tmp = *a;\n    *a = *b;\n    *b = tmp;\n}\nint main() {\n    int x = 10, y = 20;\n    printf("교환 전: x=%d, y=%d\\n", x, y);\n    swap(&x, &y);\n    printf("교환 후: x=%d, y=%d\\n", x, y);\n    return 0;\n}`},
-  {"page": 127, "title": "배열을 함수에 전달", "type": "작성 예", "desc": "배열 합계 함수", "code": `#include <stdio.h>\nint sum(int arr[], int size) {\n    int i, total = 0;\n    for (i = 0; i < size; i++) {\n        total += arr[i];\n    }\n    return total;\n}\nint main() {\n    int nums[5] = {10, 20, 30, 40, 50};\n    printf("합계: %d\\n", sum(nums, 5));\n    return 0;\n}`},
-  {"page": 130, "title": "문자열 함수 활용", "type": "작성 예", "desc": "strlen, strcat, strcmp", "code": `#include <stdio.h>\n#include <string.h>\nint main() {\n    char str1[20] = "Hello";\n    char str2[20] = "World";\n    printf("길이: %d\\n", strlen(str1));\n    strcat(str1, str2);\n    printf("연결: %s\\n", str1);\n    printf("비교: %d\\n", strcmp(str1, str2));\n    return 0;\n}`},
-  {"page": 131, "title": "포인터 반환 함수", "type": "작성 예", "desc": "최대값 위치 반환", "code": `#include <stdio.h>\nint *findMax(int *arr, int size) {\n    int *max = arr;\n    int i;\n    for (i = 1; i < size; i++) {\n        if (*(arr + i) > *max) {\n            max = arr + i;\n        }\n    }\n    return max;\n}\nint main() {\n    int nums[5] = {3, 8, 2, 9, 5};\n    int *p = findMax(nums, 5);\n    printf("최대값: %d\\n", *p);\n    return 0;\n}`},
-  {"page": 132, "title": "제곱과 세제곱 함수", "type": "스스로 해보기", "desc": "여러 함수 정의 연습", "code": `#include <stdio.h>\nint square(int n) {\n    return n * n;\n}\nint cube(int n) {\n    return n * n * n;\n}\nint main() {\n    int num = 3;\n    printf("%d의 제곱: %d\\n", num, square(num));\n    printf("%d의 세제곱: %d\\n", num, cube(num));\n    return 0;\n}`},
-  {"page": 140, "title": "파일 열기 닫기 확인", "type": "작성 예", "desc": "fopen, fclose 기초", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("test.txt", "w");\n    if (f == NULL) {\n        printf("파일 열기 실패\\n");\n        return 1;\n    }\n    printf("파일 열기 성공\\n");\n    fclose(f);\n    return 0;\n}`},
-  {"page": 141, "title": "텍스트 파일 쓰기", "type": "작성 예", "desc": "fputs로 두 줄 쓰기", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("hello.txt", "w");\n    if (f != NULL) {\n        fputs("안녕하세요, C 파일 입출력!\\n", f);\n        fputs("두 번째 줄입니다.\\n", f);\n        fclose(f);\n    }\n    return 0;\n}`},
-  {"page": 142, "title": "텍스트 파일 읽기", "type": "작성 예", "desc": "fgets로 한 줄씩 읽기", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("hello.txt", "r");\n    char line[100];\n    if (f != NULL) {\n        while (fgets(line, 100, f) != NULL) {\n            printf("%s", line);\n        }\n        fclose(f);\n    }\n    return 0;\n}`},
-  {"page": 143, "title": "이진 파일 입출력", "type": "작성 예", "desc": "fwrite, fread로 정수 배열 저장", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("data.bin", "wb");\n    int nums[3] = {10, 20, 30};\n    if (f != NULL) {\n        fwrite(nums, sizeof(int), 3, f);\n        fclose(f);\n    }\n    FILE *r = fopen("data.bin", "rb");\n    int buffer[3];\n    if (r != NULL) {\n        fread(buffer, sizeof(int), 3, r);\n        printf("%d %d %d\\n", buffer[0], buffer[1], buffer[2]);\n        fclose(r);\n    }\n    return 0;\n}`},
-  {"page": 144, "title": "파일 위치 제어", "type": "작성 예", "desc": "fseek, ftell, rewind 활용", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("hello.txt", "r");\n    if (f != NULL) {\n        fseek(f, 0, SEEK_END);\n        long size = ftell(f);\n        printf("파일 크기: %ld 바이트\\n", size);\n        rewind(f);\n        char ch = fgetc(f);\n        printf("첫 글자: %c\\n", ch);\n        fclose(f);\n    }\n    return 0;\n}`},
-  {"page": 145, "title": "성적 파일 평균 구하기", "type": "스스로 해보기", "desc": "파일에 점수 저장 후 평균 계산", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("scores.txt", "w");\n    int scores[5] = {90, 85, 88, 92, 78};\n    int i;\n    if (f != NULL) {\n        for (i = 0; i < 5; i++) {\n            fprintf(f, "%d\\n", scores[i]);\n        }\n        fclose(f);\n    }\n    int sum = 0, num;\n    f = fopen("scores.txt", "r");\n    if (f != NULL) {\n        while (fscanf(f, "%d", &num) != EOF) {\n            sum += num;\n        }\n        printf("평균: %.2f\\n", sum / 5.0);\n        fclose(f);\n    }\n    return 0;\n}`},
-  {"page": 146, "title": "파일 복사 완성", "type": "작성 예", "desc": "fgets, fputs로 전체 복사", "code": `#include <stdio.h>\nint main() {\n    FILE *src = fopen("source.txt", "r");\n    FILE *dst = fopen("dest.txt", "w");\n    char buffer[256];\n    if (src != NULL && dst != NULL) {\n        while (fgets(buffer, 256, src) != NULL) {\n            fputs(buffer, dst);\n        }\n        printf("복사 완료!\\n");\n        fclose(src);\n        fclose(dst);\n    }\n    return 0;\n}`},
-  {"page": 147, "title": "로그 파일 이어쓰기", "type": "스스로 해보기", "desc": "a 모드로 로그 추가 후 읽기", "code": `#include <stdio.h>\nint main() {\n    FILE *f = fopen("log.txt", "a");\n    if (f != NULL) {\n        fprintf(f, "[LOG] 프로그램 실행됨\\n");\n        fclose(f);\n    }\n    f = fopen("log.txt", "r");\n    char line[100];\n    if (f != NULL) {\n        printf("[로그 내용]\\n");\n        while (fgets(line, 100, f) != NULL) {\n            printf("%s", line);\n        }\n        fclose(f);\n    }\n    return 0;\n}`},
-  {"page": 148, "title": "주소록 저장 종합", "type": "스스로 해보기", "desc": "이름, 전화번호 입력받아 파일 저장", "code": `#include <stdio.h>\n#include <string.h>\nint main() {\n    FILE *f = fopen("address.txt", "w");\n    char name[20];\n    char phone[20];\n    if (f != NULL) {\n        printf("이름 입력: ");\n        scanf("%s", name);\n        printf("전화번호 입력: ");\n        scanf("%s", phone);\n        fprintf(f, "%s %s\\n", name, phone);\n        fclose(f);\n        printf("주소록 저장 완료!\\n");\n    }\n    return 0;\n}`}
-];
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-let curLessonIdx = 0, lineIdx = 0, typedHistory = [], timer = null, elapsed = 0, totalTyped = 0, totalErr = 0, showKbd = true, mode = 'line';
-let completionCount = 0;
-let isCurrentLessonCompleted = false;
+    // 2. URL 파라미터 수신 (학번/이름)
+    const urlParams = new URLSearchParams(window.location.search);
+    const studentId = urlParams.get('id');
+    const studentName = urlParams.get('name');
 
-const canvas = document.getElementById('fx-canvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
+    if (!studentId || !studentName) {
+      alert("학생 정보를 먼저 입력해야 합니다.");
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("studentDisplay").innerText = `학생: ${studentName}`;
+    }
 
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+    // 3. 타자 연습 예시 문장 목록
+    const sentences = [
+      "동해물과 백두산이 마르고 닳도록",
+      "하느님이 보우하사 우리나라 만세",
+      "무궁화 삼천리 화려 강산",
+      "대한 사람 대한으로 길이 보전하세"
+    ];
 
-function launchFireworks(countLevel) {
-  const baseCount = 60;
-  const totalParticles = baseCount + (countLevel - 1) * 40;
-  const colors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e'];
+    let currentSentenceIndex = 0;
+    let startTime = null;
+    let timerInterval = null;
+    let totalTypedChars = 0;
+    let isCompleted = false;
 
-  for (let i = 0; i < totalParticles; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = Math.random() * (6 + countLevel * 1.5) + 2;
-    particles.push({
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      alpha: 1,
-      decay: Math.random() * 0.015 + 0.005,
-      size: Math.random() * 4 + 2
+    const targetTextEl = document.getElementById("targetText");
+    const inputField = document.getElementById("inputField");
+    const cpmDisplay = document.getElementById("cpmDisplay");
+    const timerDisplay = document.getElementById("timerDisplay");
+    const resultBox = document.getElementById("resultBox");
+
+    targetTextEl.innerText = sentences[currentSentenceIndex];
+
+    // 입력 시작 시 타이머 가동
+    inputField.addEventListener("input", () => {
+      if (isCompleted) return;
+
+      if (!startTime) {
+        startTime = new Date();
+        timerInterval = setInterval(updateStats, 100);
+      }
     });
-  }
-}
 
-function animateFireworks() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let i = particles.length - 1; i >= 0; i--) {
-    const p = particles[i];
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.05;
-    p.alpha -= p.decay;
+    // Enter 키로 문장 판정 및 다음 문장 이동
+    inputField.addEventListener("keydown", async (e) => {
+      if (e.key === "Enter" && !isCompleted) {
+        const typedText = inputField.value.trim();
+        const currentTarget = sentences[currentSentenceIndex];
 
-    if (p.alpha <= 0) {
-      particles.splice(i, 1);
-    } else {
-      ctx.globalAlpha = p.alpha;
-      ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
+        if (typedText === currentTarget) {
+          totalTypedChars += currentTarget.length;
+          currentSentenceIndex++;
+
+          if (currentSentenceIndex < sentences.length) {
+            targetTextEl.innerText = sentences[currentSentenceIndex];
+            inputField.value = "";
+          } else {
+            finishTyping();
+          }
+        }
+      }
+    });
+
+    // 실시간 타수 및 소요 시간 업데이트
+    function updateStats() {
+      if (!startTime || isCompleted) return;
+
+      const currentTime = new Date();
+      const timeElapsedInSeconds = (currentTime - startTime) / 1000;
+      const currentInputChars = inputField.value.length;
+
+      const currentCpm = Math.round(((totalTypedChars + currentInputChars) / timeElapsedInSeconds) * 60);
+
+      timerDisplay.innerText = Math.floor(timeElapsedInSeconds);
+      cpmDisplay.innerText = isNaN(currentCpm) ? 0 : currentCpm;
     }
-  }
-  if (particles.length > 0) {
-    requestAnimationFrame(animateFireworks);
-  } else {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-}
 
-function triggerFireworksEffect() {
-  completionCount++;
-  launchFireworks(completionCount);
-  animateFireworks();
-}
+    // 연습 완료 처리 및 Firebase 데이터 업로드
+    async function finishTyping() {
+      isCompleted = true;
+      clearInterval(timerInterval);
+      inputField.disabled = true;
 
-function getLines() {
-  return lessons[curLessonIdx].code.split('\n');
-}
+      const finalTimeInSeconds = Math.round((new Date() - startTime) / 1000); // 총 연습시간(초)
+      const finalCpm = Math.round((totalTypedChars / (finalTimeInSeconds || 1)) * 60);
 
-function charToKey(ch) {
-  if (!ch) return null;
-  if (ch === ' ') return { base: ' ', shift: false };
-  if (ch === '\n') return { base: 'Enter', shift: false };
-  if (ch === '\\') return { base: '\\', shift: false };
-  if (/[a-z]/.test(ch)) return { base: ch, shift: false };
-  if (/[A-Z]/.test(ch)) return { base: ch.toLowerCase(), shift: true };
-  const m = {'!':['1',true],'@':['2',true],'#':['3',true],'$':['4',true],'%':['5',true],'^':['6',true],'&':['7',true],'*':['8',true],'(':['9',true],')':['0',true],'_':['-',true],'+':['=',true],'{':['[',true],'}':[']',true],'|':['\\',true],':':[';',true],'"':["'",true],'<':[',',true],'>':['.',true],'?':['/',true],'~':['`',true]};
-  if (m[ch]) return { base: m[ch][0], shift: m[ch][1] };
-  return { base: ch.toLowerCase(), shift: false };
-}
+      // 현재 시각 계산 (HH:MM:SS)
+      const now = new Date();
+      const endTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
-function highlightKbd(nextChar) {
-  const km = charToKey(nextChar);
-  const needShift = km?.shift;
-  const target = (km?.base || '').toLowerCase();
-  document.querySelectorAll('.key').forEach(k => {
-    k.classList.remove('active', 'shift-active');
-    const base = k.dataset.base;
-    if (!base) return;
-    const isShift = base.startsWith('Shift');
-    let active = false;
-    if (base === ' ') active = target === ' ';
-    else if (base === 'Enter') active = target === 'enter';
-    else if (!isShift) active = base.toLowerCase() === target;
-    
-    if (active) k.classList.add('active');
-    else if (isShift && needShift) k.classList.add('shift-active');
-  });
-}
+      cpmDisplay.innerText = finalCpm;
+      resultBox.style.display = "block";
 
-function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
-function renderLine() {
-  const lines = getLines();
-  const cur = lines[lineIdx] || '';
-  const input = document.getElementById('input').value;
-  let html = '';
-  for (let i = 0; i < cur.length; i++) {
-    const ch = cur[i];
-    let cls = '';
-    if (i < input.length) cls = input[i] === ch ? 'ok' : 'ng';
-    else if (i === input.length) cls = 'cur';
-    html += `<span class="${cls}">${esc(ch)}</span>`;
-  }
-  if (input.length > cur.length) html += `<span class="ng">${esc(input.slice(cur.length))}</span>`;
-  document.getElementById('target-line').innerHTML = html || '<span style="color:#94a3b8">빈 줄</span>';
-  document.getElementById('cur-line-no').textContent = (lineIdx + 1) + ' / ' + lines.length;
-  document.getElementById('char-count').textContent = input.length + ' / ' + cur.length;
-  document.getElementById('s-progress').textContent = (lineIdx + 1) + ' / ' + lines.length;
-  document.getElementById('line-progress').style.width = ((lineIdx + 1) / lines.length * 100) + '%';
-  const nextCh = cur[input.length] || (input.length >= cur.length ? '\n' : '');
-  highlightKbd(nextCh);
-}
-
-function renderFullEditor() {
-  const targetCode = lessons[curLessonIdx].code;
-  const val = document.getElementById('full-hidden-input').value;
-  
-  let refHtml = '';
-  for (let i = 0; i < targetCode.length; i++) {
-    const ch = targetCode[i];
-    let cls = '';
-    if (i < val.length) cls = val[i] === ch ? 'ok' : 'ng';
-    else if (i === val.length) cls = 'cur';
-    
-    if (ch === '\n') {
-      refHtml += `<span class="${cls}">\n</span>`;
-    } else {
-      refHtml += `<span class="${cls}">${esc(ch)}</span>`;
+      try {
+        const docRef = doc(db, "typing_records", studentId);
+        await updateDoc(docRef, {
+          status: "완료",
+          cpm: finalCpm,
+          elapsedTime: finalTimeInSeconds, // 총 연습시간(초)
+          endTime: endTimeStr              // 완료 시각
+        });
+      } catch (error) {
+        console.error("결과 전송 중 오류 발생:", error);
+      }
     }
-  }
-  const refEl = document.getElementById('full-ref');
-  refEl.innerHTML = refHtml;
-
-  const curRefEl = refEl.querySelector('.cur');
-  if (curRefEl) curRefEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-
-  const display = document.getElementById('full-editor-display');
-  if (val.length === 0) {
-    display.innerHTML = '<span class="placeholder">이곳을 클릭하여 타이핑을 시작하세요...</span>';
-  } else {
-    let inputHtml = '';
-    for (let i = 0; i < val.length; i++) {
-      const ch = val[i];
-      const isCorrect = i < targetCode.length && ch === targetCode[i];
-      const cls = isCorrect ? 'ok' : 'ng';
-      inputHtml += `<span class="${cls}">${esc(ch)}</span>`;
-    }
-    inputHtml += `<span class="cur">&nbsp;</span>`;
-    display.innerHTML = inputHtml;
-  }
-
-  const curDisplayEl = display.querySelector('.cur');
-  if (curDisplayEl) curDisplayEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-
-  highlightKbd(targetCode[val.length] || '');
-}
-
-function updateStats() {
-  const acc = totalTyped ? Math.round((totalTyped - totalErr) / totalTyped * 100) : 100;
-  document.getElementById('s-acc').textContent = acc + '%';
-  document.getElementById('s-typed').textContent = totalTyped;
-  document.getElementById('s-err').textContent = totalErr;
-  
-  const cpm = elapsed ? Math.round((totalTyped / elapsed) * 60) : 0;
-  document.getElementById('s-cpm').textContent = cpm;
-
-  const wpm = elapsed ? Math.round((totalTyped / 5) / (elapsed / 60)) : 0;
-  document.getElementById('s-wpm').textContent = wpm + ' WPM';
-  
-  document.getElementById('s-time').textContent = Math.floor(elapsed / 60) + ':' + String(elapsed % 60).padStart(2, '0');
-}
-
-function renderAll() {
-  const ls = lessons[curLessonIdx];
-  document.getElementById('title').textContent = ls.title;
-  document.getElementById('pageBadge').textContent = 'p.' + ls.page;
-  
-  document.querySelectorAll('.side-item').forEach((el, i) => {
-    el.classList.toggle('active', i === curLessonIdx);
-  });
-  
-  const lines = getLines();
-  if (lineIdx >= lines.length) lineIdx = lines.length - 1;
-  document.getElementById('input').value = typedHistory[lineIdx] || '';
-  
-  if (mode === 'line') {
-    document.getElementById('line-mode').style.display = '';
-    document.getElementById('full-mode').style.display = 'none';
-    renderLine();
-  } else {
-    document.getElementById('line-mode').style.display = 'none';
-    document.getElementById('full-mode').style.display = '';
-    renderFullEditor();
-  }
-  updateStats();
-}
-
-function showToast(m) {
-  const t = document.getElementById('toast');
-  t.textContent = m;
-  t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 2500);
-}
-
-function startTimerIfNeeded() {
-  if (!timer) {
-    timer = setInterval(() => {
-      elapsed++;
-      updateStats();
-    }, 1000);
-  }
-}
-
-// 사이드바 목록 클릭 처리 (경고 모달 팝업 적용)
-document.getElementById('sidebar').addEventListener('click', e => {
-  const item = e.target.closest('.side-item');
-  if (!item) return;
-  const targetIdx = parseInt(item.dataset.idx);
-  
-  if (targetIdx === curLessonIdx) return;
-
-  // 완성이 되지 않은 상태에서 클릭 시 화면 중앙 경고 모달 표시
-  if (!isCurrentLessonCompleted) {
-    document.getElementById('warn-modal').classList.add('open');
-    return;
-  }
-
-  // 완료 후 새 과제 선택 시 이동
-  curLessonIdx = targetIdx; 
-  lineIdx = 0; 
-  typedHistory = []; 
-  mode = 'line'; 
-  isCurrentLessonCompleted = false;
-  
-  document.getElementById('full-hidden-input').value = '';
-  document.getElementById('full-done').style.display = 'none';
-  renderAll();
-  document.getElementById('input').focus();
-});
-
-// 경고 모달 닫기 / 확인 버튼 클릭 시 기존 연습으로 복귀
-function closeWarnModal() {
-  document.getElementById('warn-modal').classList.remove('open');
-  if (mode === 'line') {
-    document.getElementById('input').focus();
-  } else {
-    document.getElementById('full-hidden-input').focus();
-  }
-}
-
-document.getElementById('warn-modal-ok').onclick = closeWarnModal;
-document.getElementById('warn-modal-x').onclick = closeWarnModal;
-document.getElementById('warn-modal').onclick = e => {
-  if (e.target.id === 'warn-modal') closeWarnModal();
-};
-
-document.getElementById('input').addEventListener('input', e => {
-  startTimerIfNeeded();
-  const val = e.target.value; 
-  typedHistory[lineIdx] = val;
-  const target = getLines()[lineIdx];
-  if (val.length > 0) { 
-    totalTyped++; 
-    if (val[val.length - 1] !== target[val.length - 1]) totalErr++; 
-  }
-  renderLine(); 
-  updateStats();
-});
-
-document.getElementById('input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-    const lines = getLines();
-    if (lineIdx < lines.length - 1) {
-      lineIdx++;
-      document.getElementById('input').value = typedHistory[lineIdx] || '';
-      renderLine();
-    } else {
-      showToast('한줄 연습 완료! 전체 연습으로 이동합니다.');
-      mode = 'full';
-      renderAll();
-      setTimeout(() => document.getElementById('full-hidden-input').focus(), 50);
-    }
-  }
-});
-
-document.getElementById('full-hidden-input').addEventListener('keydown', e => {
-  const ls = lessons[curLessonIdx];
-  const val = e.target.value;
-  
-  if (e.key === 'Enter' && val === ls.code) {
-    e.preventDefault();
-    document.getElementById('reset-modal').classList.add('open');
-  }
-});
-
-document.getElementById('full-hidden-input').addEventListener('input', e => {
-  startTimerIfNeeded();
-  const ls = lessons[curLessonIdx];
-  const val = e.target.value;
-  if (val.length > 0) { 
-    totalTyped++; 
-    if (val[val.length - 1] !== ls.code[val.length - 1]) totalErr++; 
-  }
-  renderFullEditor(); 
-  updateStats();
-  
-  if (val === ls.code) {
-    isCurrentLessonCompleted = true;
-    document.getElementById('full-done').style.display = 'inline-block';
-    triggerFireworksEffect();
-    showToast('전체 코드 완성! 이제 사이드바 목록을 선택해 이동할 수 있습니다.');
-  }
-});
-
-document.getElementById('reset-modal-close').onclick = () => {
-  document.getElementById('reset-modal').classList.remove('open');
-};
-
-document.getElementById('opt-restart-line').onclick = () => {
-  document.getElementById('reset-modal').classList.remove('open');
-  lineIdx = 0;
-  typedHistory = [];
-  document.getElementById('input').value = '';
-  document.getElementById('full-hidden-input').value = '';
-  document.getElementById('full-done').style.display = 'none';
-  mode = 'line';
-  renderAll();
-  showToast('현재 과제를 한 줄 모드로 재도전합니다.');
-  document.getElementById('input').focus();
-};
-
-document.getElementById('opt-restart-full').onclick = () => {
-  document.getElementById('reset-modal').classList.remove('open');
-  document.getElementById('full-hidden-input').value = '';
-  document.getElementById('full-done').style.display = 'none';
-  mode = 'full';
-  renderAll();
-  showToast('현재 과제를 전체 모드로 재도전합니다.');
-  document.getElementById('full-hidden-input').focus();
-};
-
-document.getElementById('btn-kbd').onclick = e => { showKbd = !showKbd; document.getElementById('kbd-wrap').style.display = showKbd ? '' : 'none'; e.target.textContent = showKbd ? '⌨️ ON' : '⌨️ OFF'; };
-document.getElementById('btn-original').onclick = () => { document.getElementById('modal-code').textContent = lessons[curLessonIdx].code; document.getElementById('modal').classList.add('open'); };
-document.getElementById('modal-close').onclick = () => document.getElementById('modal').classList.remove('open');
-document.getElementById('modal').onclick = e => { if (e.target.id === 'modal') e.currentTarget.classList.remove('open'); };
-document.getElementById('reset-modal').onclick = e => { if (e.target.id === 'reset-modal') e.currentTarget.classList.remove('open'); };
-
-renderAll();
-</script>
+  </script>
 </body>
 </html>
