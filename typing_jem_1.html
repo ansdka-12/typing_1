@@ -99,7 +99,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // 1. Firebase 설정
     const firebaseConfig = {
       apiKey: "AIzaSyCbD3IZgib2KCETLMqP2zMH2_WVVdxfsmk",
       authDomain: "test-26-01-20.firebaseapp.com",
@@ -112,7 +111,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 2. URL 파라미터 수신 (학번/이름)
     const urlParams = new URLSearchParams(window.location.search);
     const studentId = urlParams.get('id');
     const studentName = urlParams.get('name');
@@ -124,7 +122,6 @@
       document.getElementById("studentDisplay").innerText = `학생: ${studentName}`;
     }
 
-    // 3. 타자 연습 예시 문장 목록
     const sentences = [
       "동해물과 백두산이 마르고 닳도록",
       "하느님이 보우하사 우리나라 만세",
@@ -146,7 +143,6 @@
 
     targetTextEl.innerText = sentences[currentSentenceIndex];
 
-    // 입력 시작 시 타이머 가동
     inputField.addEventListener("input", () => {
       if (isCompleted) return;
 
@@ -156,7 +152,6 @@
       }
     });
 
-    // Enter 키로 문장 판정 및 다음 문장 이동
     inputField.addEventListener("keydown", async (e) => {
       if (e.key === "Enter" && !isCompleted) {
         const typedText = inputField.value.trim();
@@ -176,7 +171,6 @@
       }
     });
 
-    // 실시간 타수 및 소요 시간 업데이트
     function updateStats() {
       if (!startTime || isCompleted) return;
 
@@ -190,18 +184,13 @@
       cpmDisplay.innerText = isNaN(currentCpm) ? 0 : currentCpm;
     }
 
-    // 연습 완료 처리 및 Firebase 데이터 업로드
     async function finishTyping() {
       isCompleted = true;
       clearInterval(timerInterval);
       inputField.disabled = true;
 
-      const finalTimeInSeconds = Math.round((new Date() - startTime) / 1000); // 총 연습시간(초)
-      const finalCpm = Math.round((totalTypedChars / (finalTimeInSeconds || 1)) * 60);
-
-      // 현재 시각 계산 (HH:MM:SS)
-      const now = new Date();
-      const endTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+      const finalTimeInSeconds = (new Date() - startTime) / 1000;
+      const finalCpm = Math.round((totalTypedChars / finalTimeInSeconds) * 60);
 
       cpmDisplay.innerText = finalCpm;
       resultBox.style.display = "block";
@@ -210,9 +199,7 @@
         const docRef = doc(db, "typing_records", studentId);
         await updateDoc(docRef, {
           status: "완료",
-          cpm: finalCpm,
-          elapsedTime: finalTimeInSeconds, // 총 연습시간(초)
-          endTime: endTimeStr              // 완료 시각
+          cpm: finalCpm
         });
       } catch (error) {
         console.error("결과 전송 중 오류 발생:", error);
