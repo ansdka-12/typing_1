@@ -4,8 +4,20 @@
   <meta charset="UTF-8">
   <title>실시간 타자 연습 현황판</title>
   <style>
-    body { font-family: sans-serif; max-width: 800px; margin: 30px auto; padding: 20px; }
-    .summary-box { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px; font-size: 16px; }
+    body { font-family: sans-serif; max-width: 900px; margin: 30px auto; padding: 20px; }
+    .summary-box { 
+      background: #f8fafc; 
+      padding: 15px 20px; 
+      border-radius: 8px; 
+      border: 1px solid #e2e8f0; 
+      margin-bottom: 20px; 
+      font-size: 16px; 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .filter-group { display: flex; align-items: center; gap: 10px; }
+    select { padding: 6px 12px; font-size: 15px; border-radius: 6px; border: 1px solid #cbd5e1; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
     th { background-color: #f1f5f9; color: #334155; }
@@ -17,14 +29,25 @@
   <h2>실시간 학생 타자 연습 현황판</h2>
   
   <div class="summary-box">
-    <strong>진행 중: </strong><span id="activeCount" style="color: #d97706;">0</span>명 | 
-    <strong>완료: </strong><span id="completeCount" style="color: #16a34a;">0</span>명
+    <div>
+      <strong>진행 중: </strong><span id="activeCount" style="color: #d97706;">0</span>명 | 
+      <strong>완료: </strong><span id="completeCount" style="color: #16a34a;">0</span>명
+    </div>
+    
+    <!-- 접속 일자 필터 드롭다운 -->
+    <div class="filter-group">
+      <label for="dateFilter"><strong>접속 일자 조회:</strong></label>
+      <select id="dateFilter">
+        <option value="ALL">전체 누적 보기</option>
+      </select>
+    </div>
   </div>
 
   <table>
     <thead>
       <tr>
         <th>순위</th>
+        <th>접속 일자</th>
         <th>이름/학번</th>
         <th>상태</th>
         <th>타수 (CPM)</th>
@@ -50,9 +73,57 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    let allDocsData = []; // 전체 실시간 데이터를 저장할 배열
+    const dateFilterSelect = document.getElementById("dateFilter");
+
     const q = query(collection(db, "typing_records"), orderBy("cpm", "desc"));
 
+    // Firebase Firestore 데이터 실시간 감지
     onSnapshot(q, (snapshot) => {
+      allDocsData = [];
+      const datesSet = new Set();
+
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        
+        // timestamp를 날짜 형식(YYYY-MM-DD)으로 변환
+        let dateStr = "날짜 없음";
+        if (data.timestamp) {
+          const dateObj = data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp);
+          const year = dateObj.getFullYear();
+          const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+          const day = String(dateObj.getDate()).padStart(2, '0');
+          dateStr = `${year}-${month}-${day}`;
+          datesSet.add(dateStr);
+        }
+
+        allDocsData.push({
+          ...data,
+          dateStr: dateStr
+        });
+      });
+
+      // 일자 선택 드롭다운 옵션 동적 업데이트
+      const currentSelected = dateFilterSelect.value;
+      dateFilterSelect.innerHTML = '<option value="ALL">전체 누적 보기</option>';
+      
+      Array.from(datesSet).sort().reverse().forEach(date => {
+        const option = document.createElement("option");
+        option.value = date;
+        option.innerText = date;
+        if (date === currentSelected) option.selected = true;
+        dateFilterSelect.appendChild(option);
+      });
+
+      // 테이블 화면 그리기
+      renderTable();
+    });
+
+    // 드롭다운 변경 시 필터링 적용
+    dateFilterSelect.addEventListener("change", renderTable);
+
+    function renderTable() {
+      const selectedDate = dateFilterSelect.value;
       const tbody = document.getElementById("recordTable");
       tbody.innerHTML = "";
 
@@ -60,8 +131,12 @@
       let complete = 0;
       let rank = 1;
 
-      snapshot.forEach((doc) => {
-        const data = doc.data();
+      allDocsData.forEach((data) => {
+        // 날짜 필터링 (전체 누적 또는 선택한 날짜)
+        if (selectedDate !== "ALL" && data.dateStr !== selectedDate) {
+          return;
+        }
+
         if (data.status === "진행 중") active++;
         if (data.status === "완료") complete++;
 
@@ -70,6 +145,7 @@
 
         tr.innerHTML = `
           <td>${data.status === '완료' ? rank++ : '-'}</td>
+          <td>${data.dateStr}</td>
           <td>${data.name}</td>
           <td class="${statusClass}">${data.status}</td>
           <td>${data.cpm ? data.cpm + ' CPM' : '-'}</td>
@@ -79,7 +155,7 @@
 
       document.getElementById("activeCount").innerText = active;
       document.getElementById("completeCount").innerText = complete;
-    });
+    }
   </script>
 </body>
 </html>
