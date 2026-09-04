@@ -18,7 +18,7 @@ header{background:white;border-bottom:2px solid #e2e8f0;padding:12px 20px;displa
 .side-item .pg{font-size:10px;color:#64748b;font-weight:700}
 .side-item .tt{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;position:relative}
-.main-content{flex:1}
+.main-content{flex:1;display:flex;flex-direction:column}
 .status-bar{height:54px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;padding:0 16px}
 .status-left{display:flex}
 .s-item{padding:0 14px;border-right:1px solid #e2e8f0;display:flex;flex-direction:column;min-width:90px}
@@ -29,25 +29,72 @@ header{background:white;border-bottom:2px solid #e2e8f0;padding:12px 20px;displa
 .btn{height:32px;padding:0 12px;border-radius:8px;border:1px solid #e2e8f0;background:white;font-size:12px;font-weight:600;cursor:pointer}
 .btn-primary{background:#0f172a;color:white;border-color:#0f172a}
 .pill{font-size:11px;padding:4px 10px;border-radius:20px;background:#eff6ff;border:1px solid #dbeafe;color:#2563eb;font-weight:700}
-.current-card{margin:16px;background:white;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
-.card-hd{padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:12px;font-weight:700}
 
-.target-line{padding:18px 20px;font-size:18px;line-height:1.8;white-space:pre-wrap;word-break:break-all;min-height:68px;font-weight:700}
+/* 한 줄 모드 레이아웃 */
+.practice-container{display:flex;gap:16px;padding:16px;align-items:stretch}
+.practice-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+
+.current-card{background:white;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
+.card-hd{padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;font-size:12px;font-weight:700}
+.target-line{padding:16px 18px;font-size:18px;line-height:1.7;white-space:pre-wrap;word-break:break-all;min-height:64px;font-weight:700}
 .ok{color:#0f766e;background:#ccfbf1;font-weight:800}
 .ng{color:#dc2626;background:#fee2e2;font-weight:800}
 .cur{background:#3b82f6;color:white;font-weight:800}
 
-.input-area{margin:0 16px 16px 16px;background:white;border:2px solid #cbd5e1;border-radius:12px;overflow:hidden}
-.input-area textarea{width:100%;min-height:64px;border:none;outline:none;padding:14px 16px;font-size:16px;font-family:Consolas, 'Courier New', monospace;resize:none}
+.input-area{background:white;border:2px solid #cbd5e1;border-radius:12px;overflow:hidden}
+.input-area textarea{width:100%;min-height:72px;border:none;outline:none;padding:14px 16px;font-size:16px;font-family:Consolas, 'Courier New', monospace;resize:none}
 
-.kbd-wrap{margin:16px;background:white;border:2px solid #e2e8f0;border-radius:16px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.06);position:sticky;bottom:0;z-index:40}
-.kbd-rows{display:flex;flex-direction:column;gap:6px;align-items:center}
-.kbd-row{display:flex;gap:6px;justify-content:center}
-.key{min-width:46px;height:52px;border-radius:8px;border:2px solid #e2e8f0;background:white;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#334155;box-shadow:0 3px 8px rgba(0,0,0,.12);transition:.12s}
-.key.active{background:#2563eb;border-color:#2563eb;color:white;transform:scale(1.08);box-shadow:0 0 0 4px rgba(37,99,235,.3)}
+/* 하트 위치 고정을 위한 둥둥 떠 있는 패널 영역 */
+.heart-side-panel{width:190px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;position:relative}
+.growing-heart-box{position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center}
+.growing-heart{position:absolute;line-height:1;transition:font-size 0.35s ease;user-select:none;display:inline-block}
+.growing-heart.active{animation:heartbeat 1.2s infinite alternate ease-in-out;filter:drop-shadow(0 4px 12px rgba(239,68,68,0.35))}
+.heart-count-pill{position:absolute;bottom:10px;background:#0f172a;color:white;font-size:11px;font-weight:800;padding:2px 8px;border-radius:12px;white-space:nowrap}
+
+@keyframes heartbeat{
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* 기본 키보드 래퍼 및 키 스타일 */
+.kbd-wrap{margin:12px auto 16px auto;max-width:1000px;width:calc(100% - 32px);background:white;border:2px solid #e2e8f0;border-radius:18px;padding:16px 20px;box-shadow:0 8px 24px rgba(0,0,0,.06);position:sticky;bottom:8px;z-index:40;transition:all 0.3s ease;}
+.kbd-rows{display:flex;flex-direction:column;gap:8px;align-items:center;width:100%}
+.kbd-row{display:flex;gap:8px;justify-content:center;width:100%}
+.key{flex:1;height:62px;border-radius:10px;border:2px solid #cbd5e1;background:white;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;color:#334155;box-shadow:0 3px 6px rgba(0,0,0,.06);transition:.12s;user-select:none}
+.key.active{background:#2563eb;border-color:#2563eb;color:white;transform:scale(1.05);box-shadow:0 0 0 4px rgba(37,99,235,.3)}
 .key.shift-active{background:#f59e0b;border-color:#f59e0b;color:white}
-.key.space{width:380px}
-.key.special{background:#f1f5f9;font-size:11px}
+
+.key.special{background:#f1f5f9;font-size:13px}
+.key.k-backspace{flex:1.8}
+.key.k-tab{flex:1.4}
+.key.k-caps{flex:1.6}
+.key.k-enter{flex:2}
+.key.k-shift-l{flex:2.2}
+.key.k-shift-r{flex:2.5}
+.key.space{flex:6.5}
+.key.k-mod{flex:1.2}
+
+/* 변수 할당과 출력 이후(인덱스 3 이상) 컴팩트 모드 */
+body.compact-mode .kbd-row.number-row {
+  display: none !important;
+}
+body.compact-mode .kbd-wrap {
+  padding: 10px 16px;
+}
+body.compact-mode .key {
+  height: 44px;
+  font-size: 14px;
+}
+body.compact-mode #full-editor-display,
+body.compact-mode #full-hidden-input {
+  min-height: 280px !important;
+  max-height: 380px !important;
+}
+body.compact-mode #full-ref {
+  max-height: 140px !important;
+}
+
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
 .modal.open{display:flex}
 .modal-box{background:white;border-radius:16px;max-width:720px;width:100%;max-height:82vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid #e2e8f0}
@@ -147,37 +194,70 @@ header{background:white;border-bottom:2px solid #e2e8f0;padding:12px 20px;displa
 </div>
 <div style="height:6px;background:#f1f5f9;border-bottom:1px solid #e2e8f0"><div id="line-progress" style="height:100%;width:16%;background:linear-gradient(90deg,#3b82f6,#14b8a6)"></div></div>
 
-<!-- 한 줄 모드 -->
+<!-- 한 줄 모드: 좌측(입력 및 타깃) + 우측(둥둥 떠 있는 하트) -->
 <div id="line-mode">
-<div class="current-card"><div class="card-hd"><span>현재 줄 <span id="cur-line-no" class="mono">1 / 6</span></span><span id="line-acc" class="pill" style="background:#ecfdf5">100%</span></div><div class="target-line mono" id="target-line"></div></div>
-<div style="padding:0 16px 4px 16px;font-size:11px;color:#64748b;font-weight:700">타자 입력 (엔터키를 누르면 다음 줄로 이동합니다) <span style="float:right" class="mono" id="char-count">0 / 18</span></div>
-<div class="input-area"><textarea id="input" placeholder="현재 줄을 타이핑한 후 Enter를 누르세요" spellcheck="false"></textarea></div>
+  <div class="practice-container">
+    <div class="practice-left">
+      <div class="current-card">
+        <div class="card-hd">
+          <span>현재 줄 <span id="cur-line-no" class="mono">1 / 6</span></span>
+          <span id="line-acc" class="pill" style="background:#ecfdf5">100%</span>
+        </div>
+        <div class="target-line mono" id="target-line"></div>
+      </div>
+      <div style="padding:0 4px;font-size:11px;color:#64748b;font-weight:700">
+        타자 입력 (엔터키를 누르면 다음 줄로 이동합니다) 
+        <span style="float:right" class="mono" id="char-count">0 / 18</span>
+      </div>
+      <div class="input-area">
+        <textarea id="input" placeholder="현재 줄을 타이핑한 후 Enter를 누르세요" spellcheck="false"></textarea>
+      </div>
+    </div>
+    
+    <!-- 둥둥 떠 있는 하트 영역 -->
+    <div class="heart-side-panel">
+      <div class="growing-heart-box" id="heart-box">
+        <span class="growing-heart" id="growing-heart">🤍</span>
+        <span class="heart-count-pill mono" id="heart-count-pill" style="display:none">0회</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- 전체 모드 -->
 <div id="full-mode" style="display:none;padding:16px">
-<div style="font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px">샘플 코드 (실시간 오타 체크)</div>
-<div id="full-ref" class="mono"></div>
+  <div style="display:flex; gap:16px; align-items:flex-start;">
+    <div style="flex:1; min-width:0;">
+      <div style="font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px">샘플 코드 (실시간 오타 체크)</div>
+      <div id="full-ref" class="mono"></div>
 
-<div style="font-size:11px;color:#64748b;font-weight:700;margin-top:12px;margin-bottom:6px">전체 코드 타자 입력란</div>
-<div class="full-editor-container">
-  <div id="full-editor-display" class="mono"></div>
-  <textarea id="full-hidden-input" spellcheck="false"></textarea>
-</div>
-<div style="margin-top:10px;display:flex;gap:8px;align-items:center">
-  <span id="full-done" style="display:none;background:#14b8a6;color:white;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700">완료! 🎉 (Enter 키를 누르면 다음 진행 선택)</span>
-</div>
+      <div style="font-size:11px;color:#64748b;font-weight:700;margin-top:12px;margin-bottom:6px">전체 코드 타자 입력란</div>
+      <div class="full-editor-container">
+        <div id="full-editor-display" class="mono"></div>
+        <textarea id="full-hidden-input" spellcheck="false"></textarea>
+      </div>
+    </div>
+
+    <!-- 전체 모드 우측 둥둥 떠 있는 하트 영역 -->
+    <div class="heart-side-panel" style="padding-top:20px;">
+      <div class="growing-heart-box" id="heart-box-full">
+        <span class="growing-heart" id="growing-heart-full">🤍</span>
+        <span class="heart-count-pill mono" id="heart-count-pill-full" style="display:none">0회</span>
+      </div>
+    </div>
+  </div>
 </div>
 </div>
 
+<!-- 가상 키보드 -->
 <div class="kbd-wrap" id="kbd-wrap">
-<div style="font-size:14px;font-weight:800;margin-bottom:10px">⌨️ 가상 키보드 - 다음 키가 파란색으로 표시됩니다</div>
+<div style="font-size:12.5px;font-weight:800;margin-bottom:8px;color:#64748b">⌨️ 가상 키보드 - 다음 키가 파란색으로 표시됩니다</div>
 <div class="kbd-rows" id="kbd">
-<div class="kbd-row"><div class="key" data-base="`">`</div><div class="key" data-base="1">1</div><div class="key" data-base="2">2</div><div class="key" data-base="3">3</div><div class="key" data-base="4">4</div><div class="key" data-base="5">5</div><div class="key" data-base="6">6</div><div class="key" data-base="7">7</div><div class="key" data-base="8">8</div><div class="key" data-base="9">9</div><div class="key" data-base="0">0</div><div class="key" data-base="-">-</div><div class="key" data-base="=">=</div><div class="key special" data-base="Backspace" style="width:90px">Backspace</div></div>
-<div class="kbd-row"><div class="key special" data-base="Tab" style="width:90px">Tab</div><div class="key" data-base="q">q</div><div class="key" data-base="w">w</div><div class="key" data-base="e">e</div><div class="key" data-base="r">r</div><div class="key" data-base="t">t</div><div class="key" data-base="y">y</div><div class="key" data-base="u">u</div><div class="key" data-base="i">i</div><div class="key" data-base="o">o</div><div class="key" data-base="p">p</div><div class="key" data-base="[">[</div><div class="key" data-base="]">]</div><div class="key" data-base="\">\</div></div>
-<div class="kbd-row"><div class="key special" data-base="Caps" style="width:90px">Caps</div><div class="key" data-base="a">a</div><div class="key" data-base="s">s</div><div class="key" data-base="d">d</div><div class="key" data-base="f">f</div><div class="key" data-base="g">g</div><div class="key" data-base="h">h</div><div class="key" data-base="j">j</div><div class="key" data-base="k">k</div><div class="key" data-base="l">l</div><div class="key" data-base=";">;</div><div class="key" data-base="'">'</div><div class="key special" data-base="Enter" style="width:90px">Enter</div></div>
-<div class="kbd-row"><div class="key special" data-base="ShiftL" style="width:90px">Shift</div><div class="key" data-base="z">z</div><div class="key" data-base="x">x</div><div class="key" data-base="c">c</div><div class="key" data-base="v">v</div><div class="key" data-base="b">b</div><div class="key" data-base="n">n</div><div class="key" data-base="m">m</div><div class="key" data-base=",">,</div><div class="key" data-base=".">.</div><div class="key" data-base="/">/</div><div class="key special" data-base="ShiftR" style="width:90px">Shift</div></div>
-<div class="kbd-row"><div class="key special" data-base="Ctrl">Ctrl</div><div class="key special" data-base="Alt">Alt</div><div class="key space" data-base=" " style="width:380px">Space</div><div class="key special" data-base="AltR">Alt</div><div class="key special" data-base="CtrlR">Ctrl</div></div>
+<div class="kbd-row number-row"><div class="key" data-base="`">`</div><div class="key" data-base="1">1</div><div class="key" data-base="2">2</div><div class="key" data-base="3">3</div><div class="key" data-base="4">4</div><div class="key" data-base="5">5</div><div class="key" data-base="6">6</div><div class="key" data-base="7">7</div><div class="key" data-base="8">8</div><div class="key" data-base="9">9</div><div class="key" data-base="0">0</div><div class="key" data-base="-">-</div><div class="key" data-base="=">=</div><div class="key special k-backspace" data-base="Backspace">Backspace</div></div>
+<div class="kbd-row"><div class="key special k-tab" data-base="Tab">Tab</div><div class="key" data-base="q">q</div><div class="key" data-base="w">w</div><div class="key" data-base="e">e</div><div class="key" data-base="r">r</div><div class="key" data-base="t">t</div><div class="key" data-base="y">y</div><div class="key" data-base="u">u</div><div class="key" data-base="i">i</div><div class="key" data-base="o">o</div><div class="key" data-base="p">p</div><div class="key" data-base="[">[</div><div class="key" data-base="]">]</div><div class="key" data-base="\">\</div></div>
+<div class="kbd-row"><div class="key special k-caps" data-base="Caps">Caps</div><div class="key" data-base="a">a</div><div class="key" data-base="s">s</div><div class="key" data-base="d">d</div><div class="key" data-base="f">f</div><div class="key" data-base="g">g</div><div class="key" data-base="h">h</div><div class="key" data-base="j">j</div><div class="key" data-base="k">k</div><div class="key" data-base="l">l</div><div class="key" data-base=";">;</div><div class="key" data-base="'">'</div><div class="key special k-enter" data-base="Enter">Enter</div></div>
+<div class="kbd-row"><div class="key special k-shift-l" data-base="ShiftL">Shift</div><div class="key" data-base="z">z</div><div class="key" data-base="x">x</div><div class="key" data-base="c">c</div><div class="key" data-base="v">v</div><div class="key" data-base="b">b</div><div class="key" data-base="n">n</div><div class="key" data-base="m">m</div><div class="key" data-base=",">,</div><div class="key" data-base=".">.</div><div class="key" data-base="/">/</div><div class="key special k-shift-r" data-base="ShiftR">Shift</div></div>
+<div class="kbd-row"><div class="key special k-mod" data-base="Ctrl">Ctrl</div><div class="key special k-mod" data-base="Alt">Alt</div><div class="key space" data-base=" ">Space</div><div class="key special k-mod" data-base="AltR">Alt</div><div class="key special k-mod" data-base="CtrlR">Ctrl</div></div>
 </div>
 </div>
 </div>
@@ -201,7 +281,7 @@ header{background:white;border-bottom:2px solid #e2e8f0;padding:12px 20px;displa
   </div>
 </div>
 
-<!-- 목록 변경 제한 경고 모달 (화면 중앙) -->
+<!-- 목록 변경 제한 경고 모달 -->
 <div class="modal" id="warn-modal">
   <div class="modal-box" style="max-width:400px;">
     <div class="modal-hd">
@@ -336,8 +416,34 @@ function animateFireworks() {
   }
 }
 
+function updateGrowingHeart() {
+  const heartEls = [document.getElementById('growing-heart'), document.getElementById('growing-heart-full')];
+  const pillEls = [document.getElementById('heart-count-pill'), document.getElementById('heart-count-pill-full')];
+
+  heartEls.forEach((heartEl, idx) => {
+    const pillEl = pillEls[idx];
+    if (!heartEl || !pillEl) return;
+
+    if (completionCount === 0) {
+      heartEl.textContent = '🤍';
+      heartEl.style.fontSize = '38px';
+      heartEl.classList.remove('active');
+      pillEl.style.display = 'none';
+    } else {
+      heartEl.textContent = '❤️';
+      const newSize = Math.min(42 + (completionCount * 14), 130);
+      heartEl.style.fontSize = `${newSize}px`;
+      heartEl.classList.add('active');
+      
+      pillEl.textContent = `${completionCount}회 성공`;
+      pillEl.style.display = 'inline-block';
+    }
+  });
+}
+
 function triggerFireworksEffect() {
   completionCount++;
+  updateGrowingHeart();
   launchFireworks(completionCount);
   animateFireworks();
 }
@@ -465,6 +571,12 @@ function renderAll() {
   document.getElementById('title').textContent = ls.title;
   document.getElementById('pageBadge').textContent = 'p.' + ls.page;
   
+  if (curLessonIdx > 3) {
+    document.body.classList.add('compact-mode');
+  } else {
+    document.body.classList.remove('compact-mode');
+  }
+
   document.querySelectorAll('.side-item').forEach((el, i) => {
     el.classList.toggle('active', i === curLessonIdx);
   });
@@ -483,6 +595,7 @@ function renderAll() {
     renderFullEditor();
   }
   updateStats();
+  updateGrowingHeart();
 }
 
 function showToast(m) {
@@ -501,7 +614,6 @@ function startTimerIfNeeded() {
   }
 }
 
-// 사이드바 목록 클릭 처리 (경고 모달 팝업 적용)
 document.getElementById('sidebar').addEventListener('click', e => {
   const item = e.target.closest('.side-item');
   if (!item) return;
@@ -509,13 +621,11 @@ document.getElementById('sidebar').addEventListener('click', e => {
   
   if (targetIdx === curLessonIdx) return;
 
-  // 완성이 되지 않은 상태에서 클릭 시 화면 중앙 경고 모달 표시
   if (!isCurrentLessonCompleted) {
     document.getElementById('warn-modal').classList.add('open');
     return;
   }
 
-  // 완료 후 새 과제 선택 시 이동
   curLessonIdx = targetIdx; 
   lineIdx = 0; 
   typedHistory = []; 
@@ -523,12 +633,10 @@ document.getElementById('sidebar').addEventListener('click', e => {
   isCurrentLessonCompleted = false;
   
   document.getElementById('full-hidden-input').value = '';
-  document.getElementById('full-done').style.display = 'none';
   renderAll();
   document.getElementById('input').focus();
 });
 
-// 경고 모달 닫기 / 확인 버튼 클릭 시 기존 연습으로 복귀
 function closeWarnModal() {
   document.getElementById('warn-modal').classList.remove('open');
   if (mode === 'line') {
@@ -597,7 +705,6 @@ document.getElementById('full-hidden-input').addEventListener('input', e => {
   
   if (val === ls.code) {
     isCurrentLessonCompleted = true;
-    document.getElementById('full-done').style.display = 'inline-block';
     triggerFireworksEffect();
     showToast('전체 코드 완성! 이제 사이드바 목록을 선택해 이동할 수 있습니다.');
   }
@@ -613,7 +720,6 @@ document.getElementById('opt-restart-line').onclick = () => {
   typedHistory = [];
   document.getElementById('input').value = '';
   document.getElementById('full-hidden-input').value = '';
-  document.getElementById('full-done').style.display = 'none';
   mode = 'line';
   renderAll();
   showToast('현재 과제를 한 줄 모드로 재도전합니다.');
@@ -623,7 +729,6 @@ document.getElementById('opt-restart-line').onclick = () => {
 document.getElementById('opt-restart-full').onclick = () => {
   document.getElementById('reset-modal').classList.remove('open');
   document.getElementById('full-hidden-input').value = '';
-  document.getElementById('full-done').style.display = 'none';
   mode = 'full';
   renderAll();
   showToast('현재 과제를 전체 모드로 재도전합니다.');
@@ -636,6 +741,7 @@ document.getElementById('modal-close').onclick = () => document.getElementById('
 document.getElementById('modal').onclick = e => { if (e.target.id === 'modal') e.currentTarget.classList.remove('open'); };
 document.getElementById('reset-modal').onclick = e => { if (e.target.id === 'reset-modal') e.currentTarget.classList.remove('open'); };
 
+updateGrowingHeart();
 renderAll();
 </script>
 </body>
