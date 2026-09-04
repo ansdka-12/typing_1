@@ -2,32 +2,10 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>실시간 타자 연습 현황판</title>
+  <title>한일 교실 실시간 현황판</title>
   <style>
     body { font-family: sans-serif; max-width: 950px; margin: 30px auto; padding: 20px; }
-    .summary-box { 
-      background: #f8fafc; 
-      padding: 15px 20px; 
-      border-radius: 8px; 
-      border: 1px solid #e2e8f0; <!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <title>실시간 타자 연습 현황판</title>
-  <style>
-    body { font-family: sans-serif; max-width: 950px; margin: 30px auto; padding: 20px; }
-    .summary-box { 
-      background: #f8fafc; 
-      padding: 15px 20px; 
-      border-radius: 8px; 
-      border: 1px solid #e2e8f0; 
-      margin-bottom: 20px; 
-      font-size: 16px; 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .filter-group { display: flex; align-items: center; gap: 15px; }
+    .summary-box { background: #f8fafc; padding: 15px 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
     select { padding: 6px 12px; font-size: 15px; border-radius: 6px; border: 1px solid #cbd5e1; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
@@ -35,47 +13,26 @@
   </style>
 </head>
 <body>
-  <h2>실시간 학생 타자 연습 현황판</h2>
+  <h2>🏫 [한일] 실시간 타자 연습 현황판</h2>
   
   <div class="summary-box">
     <div>
       <strong>진행 중: </strong><span id="activeCount" style="color: #d97706;">0</span>명 | 
       <strong>완료: </strong><span id="completeCount" style="color: #16a34a;">0</span>명
     </div>
-    
-    <div class="filter-group">
-      <div>
-        <label for="roomFilter"><strong>교실:</strong></label>
-        <select id="roomFilter">
-          <option value="ALL">전체 교실 보기</option>
-          <option value="한일">한일</option>
-          <option value="로봇">로봇</option>
-        </select>
-      </div>
-      <div>
-        <label for="dateFilter"><strong>날짜:</strong></label>
-        <select id="dateFilter">
-          <option value="ALL">전체 누적 보기</option>
-        </select>
-      </div>
+    <div>
+      <label for="dateFilter"><strong>날짜:</strong></label>
+      <select id="dateFilter"><option value="ALL">전체 누적 보기</option></select>
     </div>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>순위</th>
-        <th>교실</th>
-        <th>날짜</th>
-        <th>학번</th>
-        <th>이름</th>
-        <th>연습시간</th>
-        <th>정확도</th>
-        <th>속도 (CPM)</th>
+        <th>순위</th><th>날짜</th><th>학번</th><th>이름</th><th>연습시간</th><th>정확도</th><th>속도 (CPM)</th>
       </tr>
     </thead>
-    <tbody id="recordTable">
-    </tbody>
+    <tbody id="recordTable"></tbody>
   </table>
 
   <script type="module">
@@ -95,9 +52,7 @@
     const db = getFirestore(app);
 
     let allDocsData = [];
-    const roomFilterSelect = document.getElementById("roomFilter");
     const dateFilterSelect = document.getElementById("dateFilter");
-
     const q = query(collection(db, "typing_records"), orderBy("cpm", "desc"));
 
     onSnapshot(q, (snapshot) => {
@@ -106,31 +61,23 @@
 
       snapshot.forEach((doc) => {
         const data = doc.data();
-        
-        let dateStr = "날짜 없음";
-        if (data.timestamp) {
-          const dateObj = data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp);
-          const year = dateObj.getFullYear();
-          const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-          const day = String(dateObj.getDate()).padStart(2, '0');
-          dateStr = `${year}-${month}-${day}`;
-          datesSet.add(dateStr);
+        // ★ [핵심] '한일' 교실 데이터만 필터링해서 가져옴
+        if (data.roomName === "한일") {
+          let dateStr = "날짜 없음";
+          if (data.timestamp) {
+            const dateObj = data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp);
+            dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+            datesSet.add(dateStr);
+          }
+          allDocsData.push({ ...data, dateStr });
         }
-
-        allDocsData.push({
-          ...data,
-          dateStr: dateStr,
-          roomName: data.roomName || "미지정"
-        });
       });
 
-      // 날짜 필터 목록 자동 업데이트 (최신순)
       const selectedDate = dateFilterSelect.value;
       dateFilterSelect.innerHTML = '<option value="ALL">전체 누적 보기</option>';
       Array.from(datesSet).sort().reverse().forEach(date => {
         const option = document.createElement("option");
-        option.value = date;
-        option.innerText = date;
+        option.value = date; option.innerText = date;
         if (date === selectedDate) option.selected = true;
         dateFilterSelect.appendChild(option);
       });
@@ -138,28 +85,18 @@
       renderTable();
     });
 
-    roomFilterSelect.addEventListener("change", renderTable);
     dateFilterSelect.addEventListener("change", renderTable);
 
     function renderTable() {
-      const selectedRoom = roomFilterSelect.value;
       const selectedDate = dateFilterSelect.value;
       const tbody = document.getElementById("recordTable");
       tbody.innerHTML = "";
-
-      let active = 0;
-      let complete = 0;
-      let rank = 1;
+      let active = 0, complete = 0, rank = 1;
 
       allDocsData.forEach((data) => {
-        // 교실 및 날짜 필터링
-        if (selectedRoom !== "ALL" && data.roomName !== selectedRoom) return;
         if (selectedDate !== "ALL" && data.dateStr !== selectedDate) return;
-
         if (data.status === "진행 중") active++;
         if (data.status === "완료") complete++;
-
-        const tr = document.createElement("tr");
 
         let formattedTime = '-';
         if (data.elapsedTime !== undefined && data.elapsedTime !== null) {
@@ -168,168 +105,14 @@
           formattedTime = min > 0 ? `${min}분 ${sec}초` : `${sec}초`;
         }
 
-        let accuracyStr = data.accuracy !== undefined ? `${data.accuracy}%` : (data.status === '완료' ? '100%' : '-');
-
+        const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${data.status === '완료' ? rank++ : '-'}</td>
-          <td>${data.roomName}</td>
           <td>${data.dateStr}</td>
           <td>${data.studentId || '-'}</td>
           <td>${data.name}</td>
           <td>${formattedTime}</td>
-          <td>${accuracyStr}</td>
-          <td>${data.cpm ? data.cpm + ' CPM' : '-'}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById("activeCount").innerText = active;
-      document.getElementById("completeCount").innerText = complete;
-    }
-  </script>
-</body>
-</html>
-      margin-bottom: 20px; 
-      font-size: 16px; 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .filter-group { display: flex; align-items: center; gap: 10px; }
-    select { padding: 6px 12px; font-size: 15px; border-radius: 6px; border: 1px solid #cbd5e1; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
-    th { background-color: #f1f5f9; color: #334155; }
-  </style>
-</head>
-<body>
-  <h2>실시간 학생 타자 연습 현황판</h2>
-  
-  <div class="summary-box">
-    <div>
-      <strong>진행 중: </strong><span id="activeCount" style="color: #d97706;">0</span>명 | 
-      <strong>완료: </strong><span id="completeCount" style="color: #16a34a;">0</span>명
-    </div>
-    
-    <div class="filter-group">
-      <label for="dateFilter"><strong>접속 일자 조회:</strong></label>
-      <select id="dateFilter">
-        <option value="ALL">전체 누적 보기</option>
-      </select>
-    </div>
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>순위</th>
-        <th>날짜</th>
-        <th>이름/학번</th>
-        <th>연습시간</th>
-        <th>정확도</th>
-        <th>속도 (CPM)</th>
-      </tr>
-    </thead>
-    <tbody id="recordTable">
-    </tbody>
-  </table>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCbD3IZgib2KCETLMqP2zMH2_WVVdxfsmk",
-      authDomain: "test-26-01-20.firebaseapp.com",
-      projectId: "test-26-01-20",
-      storageBucket: "test-26-01-20.firebasestorage.app",
-      messagingSenderId: "1046847215998",
-      appId: "1:1046847215998:web:f9ce56e45c28c4e61f7b2f"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    let allDocsData = [];
-    const dateFilterSelect = document.getElementById("dateFilter");
-
-    const q = query(collection(db, "typing_records"), orderBy("cpm", "desc"));
-
-    onSnapshot(q, (snapshot) => {
-      allDocsData = [];
-      const datesSet = new Set();
-
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        
-        let dateStr = "날짜 없음";
-        if (data.timestamp) {
-          const dateObj = data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp);
-          const year = dateObj.getFullYear();
-          const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-          const day = String(dateObj.getDate()).padStart(2, '0');
-          dateStr = `${year}-${month}-${day}`;
-          datesSet.add(dateStr);
-        }
-
-        allDocsData.push({
-          ...data,
-          dateStr: dateStr
-        });
-      });
-
-      const currentSelected = dateFilterSelect.value;
-      dateFilterSelect.innerHTML = '<option value="ALL">전체 누적 보기</option>';
-      
-      Array.from(datesSet).sort().reverse().forEach(date => {
-        const option = document.createElement("option");
-        option.value = date;
-        option.innerText = date;
-        if (date === currentSelected) option.selected = true;
-        dateFilterSelect.appendChild(option);
-      });
-
-      renderTable();
-    });
-
-    dateFilterSelect.addEventListener("change", renderTable);
-
-    function renderTable() {
-      const selectedDate = dateFilterSelect.value;
-      const tbody = document.getElementById("recordTable");
-      tbody.innerHTML = "";
-
-      let active = 0;
-      let complete = 0;
-      let rank = 1;
-
-      allDocsData.forEach((data) => {
-        if (selectedDate !== "ALL" && data.dateStr !== selectedDate) {
-          return;
-        }
-
-        if (data.status === "진행 중") active++;
-        if (data.status === "완료") complete++;
-
-        const tr = document.createElement("tr");
-
-        // 연습시간(초) 포맷팅
-        let formattedTime = '-';
-        if (data.elapsedTime !== undefined && data.elapsedTime !== null) {
-          const min = Math.floor(data.elapsedTime / 60);
-          const sec = data.elapsedTime % 60;
-          formattedTime = min > 0 ? `${min}분 ${sec}초` : `${sec}초`;
-        }
-
-        // 정확도 포맷팅
-        let accuracyStr = data.accuracy !== undefined ? `${data.accuracy}%` : (data.status === '완료' ? '100%' : '-');
-
-        tr.innerHTML = `
-          <td>${data.status === '완료' ? rank++ : '-'}</td>
-          <td>${data.dateStr}</td>
-          <td>${data.name}</td>
-          <td>${formattedTime}</td>
-          <td>${accuracyStr}</td>
+          <td>${data.accuracy !== undefined ? data.accuracy + '%' : '-'}</td>
           <td>${data.cpm ? data.cpm + ' CPM' : '-'}</td>
         `;
         tbody.appendChild(tr);
