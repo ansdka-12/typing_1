@@ -5,39 +5,74 @@
   <title>로봇 교실 실시간 현황판</title>
   <style>
     body { font-family: sans-serif; max-width: 950px; margin: 30px auto; padding: 20px; }
-    .summary-box { background: #f8fafc; padding: 15px 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px; font-size: 16px; display: flex; justify-content: space-between; align-items: center; }
+    .summary-box { 
+      background: #f8fafc; 
+      padding: 15px 20px; 
+      border-radius: 8px; 
+      border: 1px solid #e2e8f0; 
+      margin-bottom: 20px; 
+      font-size: 16px; 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .right-tools { display: flex; align-items: center; gap: 15px; }
     select { padding: 6px 12px; font-size: 15px; border-radius: 6px; border: 1px solid #cbd5e1; }
+    .clear-btn {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 7px 14px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .clear-btn:hover { background-color: #dc2626; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; }
     th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
     th { background-color: #f1f5f9; color: #334155; }
   </style>
 </head>
 <body>
-  <h2>🏫 [로봇] 실시간 타자 연습 현황판</h2>
+  <h2>🤖 [로봇] 실시간 타자 연습 현황판</h2>
   
   <div class="summary-box">
     <div>
       <strong>진행 중: </strong><span id="activeCount" style="color: #d97706;">0</span>명 | 
       <strong>완료: </strong><span id="completeCount" style="color: #16a34a;">0</span>명
     </div>
-    <div>
-      <label for="dateFilter"><strong>날짜:</strong></label>
-      <select id="dateFilter"><option value="ALL">전체 누적 보기</option></select>
+
+    <div class="right-tools">
+      <div>
+        <label for="dateFilter"><strong>날짜:</strong></label>
+        <select id="dateFilter">
+          <option value="ALL">전체 누적 보기</option>
+        </select>
+      </div>
+      <button class="clear-btn" id="resetBtn">🗑️ 로봇 기록 초기화</button>
     </div>
   </div>
 
   <table>
     <thead>
       <tr>
-        <th>순위</th><th>날짜</th><th>학번</th><th>이름</th><th>연습시간</th><th>정확도</th><th>속도 (CPM)</th>
+        <th>순위</th>
+        <th>날짜</th>
+        <th>학번</th>
+        <th>이름</th>
+        <th>연습시간</th>
+        <th>정확도</th>
+        <th>속도 (CPM)</th>
       </tr>
     </thead>
-    <tbody id="recordTable"></tbody>
+    <tbody id="recordTable">
+    </tbody>
   </table>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, query, orderBy, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCbD3IZgib2KCETLMqP2zMH2_WVVdxfsmk",
@@ -59,17 +94,19 @@
       allDocsData = [];
       const datesSet = new Set();
 
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        // ★ [핵심] '로봇' 교실 데이터만 필터링해서 가져옴
+      snapshot.forEach((docSnapshot) => {
+        const data = docSnapshot.data();
         if (data.roomName === "로봇") {
           let dateStr = "날짜 없음";
           if (data.timestamp) {
             const dateObj = data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp);
-            dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            dateStr = `${year}-${month}-${day}`;
             datesSet.add(dateStr);
           }
-          allDocsData.push({ ...data, dateStr });
+          allDocsData.push({ ...data, docId: docSnapshot.id, dateStr });
         }
       });
 
@@ -77,7 +114,8 @@
       dateFilterSelect.innerHTML = '<option value="ALL">전체 누적 보기</option>';
       Array.from(datesSet).sort().reverse().forEach(date => {
         const option = document.createElement("option");
-        option.value = date; option.innerText = date;
+        option.value = date;
+        option.innerText = date;
         if (date === selectedDate) option.selected = true;
         dateFilterSelect.appendChild(option);
       });
@@ -91,12 +129,18 @@
       const selectedDate = dateFilterSelect.value;
       const tbody = document.getElementById("recordTable");
       tbody.innerHTML = "";
-      let active = 0, complete = 0, rank = 1;
+
+      let active = 0;
+      let complete = 0;
+      let rank = 1;
 
       allDocsData.forEach((data) => {
         if (selectedDate !== "ALL" && data.dateStr !== selectedDate) return;
+
         if (data.status === "진행 중") active++;
         if (data.status === "완료") complete++;
+
+        const tr = document.createElement("tr");
 
         let formattedTime = '-';
         if (data.elapsedTime !== undefined && data.elapsedTime !== null) {
@@ -105,7 +149,6 @@
           formattedTime = min > 0 ? `${min}분 ${sec}초` : `${sec}초`;
         }
 
-        const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${data.status === '완료' ? rank++ : '-'}</td>
           <td>${data.dateStr}</td>
@@ -121,6 +164,28 @@
       document.getElementById("activeCount").innerText = active;
       document.getElementById("completeCount").innerText = complete;
     }
+
+    // [초기화 버튼] 클릭 이벤트 (로봇 교실 전체 삭제)
+    document.getElementById("resetBtn").addEventListener("click", async () => {
+      if (confirm("정말로 [로봇] 교실의 모든 학생 기록을 삭제하고 초기화하시겠습니까?")) {
+        try {
+          const snapshot = await getDocs(collection(db, "typing_records"));
+          const deletePromises = [];
+          
+          snapshot.forEach((docSnapshot) => {
+            if (docSnapshot.data().roomName === "로봇") {
+              deletePromises.push(deleteDoc(doc(db, "typing_records", docSnapshot.id)));
+            }
+          });
+
+          await Promise.all(deletePromises);
+          alert("로봇 교실 학생 데이터가 성공적으로 초기화되었습니다.");
+        } catch (error) {
+          console.error("초기화 실패:", error);
+          alert("데이터 초기화 도중 오류가 발생했습니다.");
+        }
+      }
+    });
   </script>
 </body>
 </html>
