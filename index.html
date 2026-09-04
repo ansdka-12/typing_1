@@ -2,31 +2,42 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>타자 연습 - 학생 등록</title>
+  <title>C프로그래밍 타자 연습 - 학생 등록</title>
   <style>
-    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f8fafc; }
-    .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 320px; text-align: center; }
-    h2 { margin-bottom: 20px; color: #1e293b; }
-    input { width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
-    button { width: 100%; padding: 12px; background-color: #2563eb; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
-    button:hover { background-color: #1d4ed8; }
+    body { font-family: sans-serif; background: #f1f5f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+    .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; }
+    h2 { text-align: center; color: #1e293b; margin-bottom: 20px; }
+    label { font-weight: bold; color: #475569; display: block; margin-top: 12px; }
+    input, select { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+    button { width: 100%; margin-top: 20px; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    button:hover { background: #1d4ed8; }
   </style>
 </head>
 <body>
   <div class="card">
     <h2>타자 연습 시작하기</h2>
-    <form id="studentForm">
-      <input type="text" id="studentId" placeholder="학번 (예: 10101)" required>
-      <input type="text" id="studentName" placeholder="이름 (예: 홍길동)" required>
-      <button type="submit" id="startBtn">입장 및 연습 시작</button>
+    <form id="loginForm">
+      <label for="roomName">교실 선택</label>
+      <select id="roomName" required>
+        <option value="">교실을 선택하세요</option>
+        <option value="한일">한일</option>
+        <option value="로봇">로봇</option>
+      </select>
+
+      <label for="studentId">학번</label>
+      <input type="text" id="studentId" placeholder="예: 20315" required>
+
+      <label for="studentName">이름</label>
+      <input type="text" id="studentName" placeholder="예: 홍길동" required>
+
+      <button type="submit">연습 시작하기</button>
     </form>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // teacher_2.html에 사용된 동일한 Firebase 설정
     const firebaseConfig = {
       apiKey: "AIzaSyCbD3IZgib2KCETLMqP2zMH2_WVVdxfsmk",
       authDomain: "test-26-01-20.firebaseapp.com",
@@ -39,29 +50,26 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    document.getElementById("studentForm").addEventListener("submit", async (e) => {
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      
+      const roomName = document.getElementById("roomName").value;
       const studentId = document.getElementById("studentId").value.trim();
       const studentName = document.getElementById("studentName").value.trim();
-      const fullName = `${studentId} ${studentName}`;
-      
-      // 학번을 문서 ID로 지정하여 중복 생성 방지
-      const docRef = doc(db, "typing_records", studentId);
-      
+
+      const docId = studentId;
+
       try {
-        // Firebase에 "진행 중" 상태 기록
-        await setDoc(docRef, {
-          name: fullName,
+        await setDoc(doc(db, "typing_records", docId), {
+          roomName: roomName,
+          studentId: studentId,
+          name: studentName,
           status: "진행 중",
-          cpm: 0,
-          timestamp: new Date()
+          timestamp: serverTimestamp()
         });
 
-        // 학번과 이름을 URL 파라미터로 넘기며 타자 연습 화면으로 이동
-        window.location.href = `typing_jem_1.html?id=${encodeURIComponent(studentId)}&name=${encodeURIComponent(fullName)}`;
+        window.location.href = `typing_jem_1.html?id=${encodeURIComponent(docId)}&name=${encodeURIComponent(studentName)}&room=${encodeURIComponent(roomName)}`;
       } catch (error) {
-        alert("등록 중 오류가 발생했습니다: " + error.message);
+        console.error("등록 중 오류 발생:", error);
       }
     });
   </script>
