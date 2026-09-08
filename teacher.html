@@ -2,77 +2,94 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>한일 교실 실시간 현황판</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>실시간 학생 타자 연습 현황판</title>
   <style>
-    body { font-family: sans-serif; max-width: 950px; margin: 30px auto; padding: 20px; }
-    .summary-box { 
-      background: #f8fafc; 
-      padding: 15px 20px; 
-      border-radius: 8px; 
-      border: 1px solid #e2e8f0; 
-      margin-bottom: 20px; 
-      font-size: 16px; 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .right-tools { display: flex; align-items: center; gap: 15px; }
-    select { padding: 6px 12px; font-size: 15px; border-radius: 6px; border: 1px solid #cbd5e1; }
-    .clear-btn {
-      background-color: #ef4444;
-      color: white;
-      border: none;
-      padding: 7px 14px;
-      font-size: 14px;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .clear-btn:hover { background-color: #dc2626; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #e2e8f0; padding: 12px; text-align: center; }
-    th { background-color: #f1f5f9; color: #334155; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #0f172a; padding: 24px; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    h1 { font-size: 22px; font-weight: 800; }
+    
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .filter-box { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #475569; }
+    select { padding: 6px 12px; font-size: 13px; font-weight: 700; border-radius: 8px; border: 1px solid #cbd5e1; background: white; color: #0f172a; outline: none; cursor: pointer; }
+    .btn-clear { background: #ef4444; color: white; border: none; padding: 7px 12px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: .15s; }
+    .btn-clear:hover { background: #dc2626; }
+
+    .stats-card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+    .stat-card { background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .stat-label { font-size: 13px; color: #64748b; font-weight: 700; margin-bottom: 4px; }
+    .stat-val { font-size: 26px; font-weight: 800; font-family: Consolas, monospace; }
+
+    .table-box { background: white; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    table { width: 100%; border-collapse: collapse; text-align: center; }
+    th { background: #f1f5f9; color: #475569; font-size: 13px; font-weight: 700; padding: 14px; border-bottom: 1px solid #e2e8f0; }
+    td { padding: 14px; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
+    tr:last-child td { border-bottom: none; }
+
+    .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .badge-ing { background: #fef3c7; color: #d97706; }
+    .badge-done { background: #dcfce7; color: #16a34a; }
+    .mono { font-family: Consolas, Monaco, monospace; font-weight: 700; }
   </style>
 </head>
 <body>
-  <h2>🏫 [한일] 실시간 타자 연습 현황판</h2>
-  
-  <div class="summary-box">
-    <div>
-      <strong>진행 중: </strong><span id="activeCount" style="color: #d97706;">0</span>명 | 
-      <strong>완료: </strong><span id="completeCount" style="color: #16a34a;">0</span>명
+  <div class="container">
+    <header>
+      <h1>🖥️ 실시간 학생 타자 연습 현황판</h1>
+      <div class="header-right">
+        <div class="filter-box">
+          <label for="dateSelect">📅 날짜 선택:</label>
+          <select id="dateSelect">
+            <option value="TODAY">오늘</option>
+            <option value="ALL">전체 누적 보기</option>
+          </select>
+        </div>
+        <button class="btn-clear" id="btnClearAll">🗑️ 기록 삭제</button>
+      </div>
+    </header>
+
+    <div class="stats-card-grid">
+      <div class="stat-card">
+        <div class="stat-label">조회 학생 수</div>
+        <div class="stat-val" id="totalCount">0명</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">현재 연습 중</div>
+        <div class="stat-val" id="ingCount" style="color: #d97706;">0명</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">연습 완료</div>
+        <div class="stat-val" id="doneCount" style="color: #16a34a;">0명</div>
+      </div>
     </div>
 
-    <div class="right-tools">
-      <div>
-        <label for="dateFilter"><strong>날짜:</strong></label>
-        <select id="dateFilter">
-          <option value="ALL">전체 누적 보기</option>
-        </select>
-      </div>
-      <button class="clear-btn" id="resetBtn">🗑️ 기록 초기화</button>
+    <div class="table-box">
+      <table>
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>학번</th>
+            <th>이름</th>
+            <th>상태</th>
+            <th>연습 시간</th>
+            <th>실시간 정확도</th>
+            <th>실시간 타속 (CPM)</th>
+          </tr>
+        </thead>
+        <tbody id="studentList">
+          <tr>
+            <td colspan="7" style="color: #94a3b8; padding: 30px;">학생 접속 대기 중...</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>순위</th>
-        <th>날짜</th>
-        <th>학번</th>
-        <th>이름</th>
-        <th>연습시간</th>
-        <th>정확도</th>
-        <th>속도 (CPM)</th>
-      </tr>
-    </thead>
-    <tbody id="recordTable">
-    </tbody>
-  </table>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, onSnapshot, query, orderBy, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, onSnapshot, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCbD3IZgib2KCETLMqP2zMH2_WVVdxfsmk",
@@ -86,105 +103,176 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    let allDocsData = [];
-    const dateFilterSelect = document.getElementById("dateFilter");
-    const q = query(collection(db, "typing_records"), orderBy("cpm", "desc"));
+    const studentListEl = document.getElementById("studentList");
+    const dateSelectEl = document.getElementById("dateSelect");
+    let rawDocsData = []; // 전체 Firestore 원본 데이터 보관
 
-    // 실시간 현황판 수신
-    onSnapshot(q, (snapshot) => {
-      allDocsData = [];
-      const datesSet = new Set();
-
-      snapshot.forEach((docSnapshot) => {
-        const data = docSnapshot.data();
-        if (data.roomName === "한일") {
-          let dateStr = "날짜 없음";
-          if (data.timestamp) {
-            const dateObj = data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp);
-            const year = dateObj.getFullYear();
-            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const day = String(dateObj.getDate()).padStart(2, '0');
-            dateStr = `${year}-${month}-${day}`;
-            datesSet.add(dateStr);
-          }
-          allDocsData.push({ ...data, docId: docSnapshot.id, dateStr });
-        }
-      });
-
-      const selectedDate = dateFilterSelect.value;
-      dateFilterSelect.innerHTML = '<option value="ALL">전체 누적 보기</option>';
-      Array.from(datesSet).sort().reverse().forEach(date => {
-        const option = document.createElement("option");
-        option.value = date;
-        option.innerText = date;
-        if (date === selectedDate) option.selected = true;
-        dateFilterSelect.appendChild(option);
-      });
-
-      renderTable();
-    });
-
-    dateFilterSelect.addEventListener("change", renderTable);
-
-    function renderTable() {
-      const selectedDate = dateFilterSelect.value;
-      const tbody = document.getElementById("recordTable");
-      tbody.innerHTML = "";
-
-      let active = 0;
-      let complete = 0;
-      let rank = 1;
-
-      allDocsData.forEach((data) => {
-        if (selectedDate !== "ALL" && data.dateStr !== selectedDate) return;
-
-        if (data.status === "진행 중") active++;
-        if (data.status === "완료") complete++;
-
-        const tr = document.createElement("tr");
-
-        let formattedTime = '-';
-        if (data.elapsedTime !== undefined && data.elapsedTime !== null) {
-          const min = Math.floor(data.elapsedTime / 60);
-          const sec = data.elapsedTime % 60;
-          formattedTime = min > 0 ? `${min}분 ${sec}초` : `${sec}초`;
-        }
-
-        tr.innerHTML = `
-          <td>${data.status === '완료' ? rank++ : '-'}</td>
-          <td>${data.dateStr}</td>
-          <td>${data.studentId || '-'}</td>
-          <td>${data.name}</td>
-          <td>${formattedTime}</td>
-          <td>${data.accuracy !== undefined ? data.accuracy + '%' : '-'}</td>
-          <td>${data.cpm ? data.cpm + ' CPM' : '-'}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      document.getElementById("activeCount").innerText = active;
-      document.getElementById("completeCount").innerText = complete;
+    function getTodayString() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
     }
 
-    // [초기화 버튼] 클릭 이벤트 (한일 교실 전체 삭제)
-    document.getElementById("resetBtn").addEventListener("click", async () => {
-      if (confirm("정말로 [한일] 교실의 모든 학생 기록을 삭제하고 초기화하시겠습니까?")) {
-        try {
-          const snapshot = await getDocs(collection(db, "typing_records"));
-          const deletePromises = [];
-          
-          snapshot.forEach((docSnapshot) => {
-            if (docSnapshot.data().roomName === "한일") {
-              deletePromises.push(deleteDoc(doc(db, "typing_records", docSnapshot.id)));
-            }
-          });
+    function formatTime(seconds) {
+      if (!seconds) return "0초";
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return m > 0 ? `${m}분 ${s}초` : `${s}초`;
+    }
 
-          await Promise.all(deletePromises);
-          alert("한일 교실 학생 데이터가 성공적으로 초기화되었습니다.");
-        } catch (error) {
-          console.error("초기화 실패:", error);
-          alert("데이터 초기화 도중 오류가 발생했습니다.");
+    function parseDateString(timestamp) {
+      if (!timestamp) return "날짜 없음";
+      try {
+        const dateObj = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      } catch (e) {
+        return "날짜 오류";
+      }
+    }
+
+    // 화면 렌더링 함수
+    function renderView() {
+      const selectedMode = dateSelectEl.value;
+      const todayStr = getTodayString();
+      const targetDate = selectedMode === "TODAY" ? todayStr : selectedMode;
+
+      // 필터링 적용
+      const filtered = rawDocsData.filter(item => {
+        if (selectedMode === "ALL") return true;
+        return item.dateStr === targetDate;
+      });
+
+      if (filtered.length === 0) {
+        studentListEl.innerHTML = `<tr><td colspan="7" style="color: #94a3b8; padding: 30px;">선택한 조건의 학생 기록이 없습니다.</td></tr>`;
+        document.getElementById("totalCount").textContent = "0명";
+        document.getElementById("ingCount").textContent = "0명";
+        document.getElementById("doneCount").textContent = "0명";
+        return;
+      }
+
+      // 학번(ID) 오름차순 정렬
+      filtered.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
+
+      let ing = 0;
+      let done = 0;
+      studentListEl.innerHTML = "";
+
+      filtered.forEach(data => {
+        const isDone = data.status === "완료";
+        if (isDone) done++; else ing++;
+
+        // 이름 및 학번 분리
+        let studentId = data.id;
+        let studentName = "-";
+        if (data.name) {
+          const parts = data.name.trim().split(" ");
+          if (parts.length >= 2) {
+            studentId = parts[0];
+            studentName = parts.slice(1).join(" ");
+          } else {
+            studentName = data.name;
+          }
         }
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="mono" style="font-size: 13px; color: #64748b;">${data.dateStr}</td>
+          <td class="mono" style="font-weight: 700;">${studentId}</td>
+          <td style="font-weight: 700;">${studentName}</td>
+          <td><span class="badge ${isDone ? 'badge-done' : 'badge-ing'}">${data.status || '진행 중'}</span></td>
+          <td class="mono">${formatTime(Number(data.elapsedTime) || 0)}</td>
+          <td class="mono" style="color: #0f766e;">${data.accuracy !== undefined ? data.accuracy + '%' : '100%'}</td>
+          <td class="mono" style="color: #2563eb; font-size: 15px;">${Number(data.cpm) || 0} CPM</td>
+        `;
+        studentListEl.appendChild(tr);
+      });
+
+      document.getElementById("totalCount").textContent = `${filtered.length}명`;
+      document.getElementById("ingCount").textContent = `${ing}명`;
+      document.getElementById("doneCount").textContent = `${done}명`;
+    }
+
+    // 날짜 옵션 목록 업데이트
+    function updateDateOptions(datesSet) {
+      const currentVal = dateSelectEl.value;
+      const todayStr = getTodayString();
+
+      dateSelectEl.innerHTML = `
+        <option value="TODAY">오늘 (${todayStr})</option>
+        <option value="ALL">전체 누적 보기</option>
+      `;
+
+      // DB에 저장된 날짜들을 내림차순으로 추가 (오늘 제외)
+      const sortedDates = Array.from(datesSet).filter(d => d !== todayStr && d !== "날짜 없음" && d !== "날짜 오류").sort().reverse();
+      sortedDates.forEach(date => {
+        const opt = document.createElement("option");
+        opt.value = date;
+        opt.textContent = date;
+        dateSelectEl.appendChild(opt);
+      });
+
+      dateSelectEl.value = currentVal;
+    }
+
+    // Firestore 실시간 리스너
+    onSnapshot(collection(db, "typing_records"), (snapshot) => {
+      rawDocsData = [];
+      const datesSet = new Set();
+
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const dateStr = parseDateString(data.timestamp);
+        datesSet.add(dateStr);
+
+        rawDocsData.push({
+          id: docSnap.id,
+          ...data,
+          dateStr: dateStr
+        });
+      });
+
+      updateDateOptions(datesSet);
+      renderView();
+    });
+
+    dateSelectEl.addEventListener("change", renderView);
+
+    // 기록 삭제 버튼 처리
+    document.getElementById("btnClearAll").addEventListener("click", async () => {
+      const selected = dateSelectEl.value;
+      const todayStr = getTodayString();
+      const targetDate = selected === "TODAY" ? todayStr : selected;
+      
+      const isAll = selected === "ALL";
+      const confirmMsg = isAll 
+        ? "⚠️ 전체 누적된 모든 학생 기록을 완전히 삭제하시겠습니까?" 
+        : `⚠️ [${targetDate}] 일자의 학생 기록을 삭제하시겠습니까?`;
+
+      if (!confirm(confirmMsg)) return;
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "typing_records"));
+        const deletePromises = [];
+
+        querySnapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const docDate = parseDateString(data.timestamp);
+
+          if (isAll || docDate === targetDate) {
+            deletePromises.push(deleteDoc(doc(db, "typing_records", docSnap.id)));
+          }
+        });
+
+        await Promise.all(deletePromises);
+        alert("✅ 삭제가 완료되었습니다.");
+      } catch (error) {
+        console.error("삭제 중 오류:", error);
+        alert("삭제 실패: " + error.message);
       }
     });
   </script>
