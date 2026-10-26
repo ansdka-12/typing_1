@@ -98,60 +98,62 @@ header{background:white;border-bottom:2px solid #e2e8f0;padding:12px 20px;displa
 </head>
 <body>
 <canvas id="fx-canvas"></canvas>
-<header><div><span class="badge">C</span><span id="title" style="font-weight:800">Hello World 출력</span><span id="pageBadge" style="margin-left:8px;background:#e2e8f0;padding:2px 8px;border-radius:12px;font-size:11px">p.65</span></div><div style="font-size:11px;color:#64748b">C 언어 타자 연습 프로그램</div></header>
+<header><div><span class="badge">C</span><span id="title" style="font-weight:800">수행연습 1</span><span id="pageBadge" style="margin-left:8px;background:#e2e8f0;padding:2px 8px;border-radius:12px;font-size:11px">수행연습</span></div><div style="font-size:11px;color:#64748b">C 언어 타자 연습 프로그램</div></header>
 <div class="layout">
 <div class="sidebar" id="sidebar">
-<div class="side-item active" data-idx="0"><div class="pg">p.65 · 작성 예</div><div class="tt">Hello World 출력</div></div>
-<div class="side-item" data-idx="1"><div class="pg">p.67 · 작성 예</div><div class="tt">변수 선언</div></div>
-<div class="side-item" data-idx="2"><div class="pg">p.68 · 작성 예</div><div class="tt">자료형 크기 확인</div></div>
-<div class="side-item" data-idx="3"><div class="pg">p.69 · 작성 예</div><div class="tt">변수 할당과 출력</div></div>
-<div class="side-item" data-idx="4"><div class="pg">p.72 · 작성 예</div><div class="tt">배열 기초 - 메달 집계</div></div>
-<div class="side-item" data-idx="5"><div class="pg">p.74 · 작성 예</div><div class="tt">2차원 배열 - 좌석 예약</div></div>
-<div class="side-item" data-idx="6"><div class="pg">p.77 · 작성 예</div><div class="tt">포인터와 배열</div></div>
-<div class="side-item" data-idx="7"><div class="pg">p.78 · 작성 예</div><div class="tt">두 변수 교환 swap</div></div>
-<div class="side-item" data-idx="8"><div class="pg">p.82 · 작성 예</div><div class="tt">printf 서식 지정자</div></div>
-<div class="side-item" data-idx="9"><div class="pg">p.83 · 작성 예</div><div class="tt">putchar, puts 함수</div></div>
-<div class="side-item" data-idx="10"><div class="pg">p.85 · 스스로 해보기</div><div class="tt">시간표 출력하기</div></div>
-<div class="side-item" data-idx="11"><div class="pg">p.86 · 작성 예</div><div class="tt">scanf 정수 입력</div></div>
-<div class="side-item" data-idx="12"><div class="pg">p.87 · 스스로 해보기</div><div class="tt">scanf 문자와 문자열</div></div>
-<div class="side-item" data-idx="13"><div class="pg">p.90 · 작성 예</div><div class="tt">산술 연산자</div></div>
-<div class="side-item" data-idx="14"><div class="pg">p.94 · 작성 예</div><div class="tt">파일 쓰기 fprintf</div></div>
-<div class="side-item" data-idx="15"><div class="pg">p.95 · 작성 예</div><div class="tt">파일 읽기 fscanf</div></div>
-<div class="side-item" data-idx="16"><div class="pg">p.96 · 작성 예</div><div class="tt">파일 복사 fgetc fputc</div></div>
-<div class="side-item" data-idx="17"><div class="pg">p.97 · 작성 예</div><div class="tt">줄 단위 입출력 fgets fputs</div></div>
-<div class="side-item" data-idx="18"><div class="pg">p.98 · 스스로 해보기</div><div class="tt">파일에 5줄 쓰기</div></div>
-<div class="side-item" data-idx="19"><div class="pg">p.104 · 작성 예</div><div class="tt">if문 홀짝 판별</div></div>
-<div class="side-item" data-idx="20"><div class="pg">p.105 · 작성 예</div><div class="tt">if-else 학점 계산</div></div>
-<div class="side-item" data-idx="21"><div class="pg">p.106 · 스스로 해보기</div><div class="tt">중첩 if 로그인</div></div>
-<div class="side-item" data-idx="22"><div class="pg">p.107 · 작성 예</div><div class="tt">switch 계절 판별</div></div>
-<div class="side-item" data-idx="23"><div class="pg">p.108 · 작성 예</div><div class="tt">switch 계산기</div></div>
-<div class="side-item" data-idx="24"><div class="pg">p.109 · 스스로 해보기</div><div class="tt">switch 메뉴 선택</div></div>
-<div class="side-item" data-idx="25"><div class="pg">p.110 · 작성 예</div><div class="tt">for문 구구단</div></div>
-<div class="side-item" data-idx="26"><div class="pg">p.111 · 작성 예</div><div class="tt">for문 별찍기</div></div>
-<div class="side-item" data-idx="27"><div class="pg">p.112 · 스스로 해보기</div><div class="tt">중첩 for 구구단 전체</div></div>
-<div class="side-item" data-idx="28"><div class="pg">p.113 · 작성 예</div><div class="tt">while 합계 구하기</div></div>
-<div class="side-item" data-idx="29"><div class="pg">p.114 · 작성 예</div><div class="tt">do-while 메뉴 반복</div></div>
-<div class="side-item" data-idx="30"><div class="pg">p.115 · 작성 예</div><div class="tt">break continue 활용</div></div>
-<div class="side-item" data-idx="31"><div class="pg">p.116 · 스스로 해보기</div><div class="tt">합이 100 넘는 순간</div></div>
-<div class="side-item" data-idx="32"><div class="pg">p.117 · 작성 예</div><div class="tt">중첩 반복문 좌표</div></div>
-<div class="side-item" data-idx="33"><div class="pg">p.118 · 스스로 해보기</div><div class="tt">무한루프와 q 탈출</div></div>
-<div class="side-item" data-idx="34"><div class="pg">p.121 · 작성 예</div><div class="tt">함수 정의와 호출</div></div>
-<div class="side-item" data-idx="35"><div class="pg">p.124 · 작성 예</div><div class="tt">매개변수와 반환값</div></div>
-<div class="side-item" data-idx="36"><div class="pg">p.125 · 작성 예</div><div class="tt">재귀함수 팩토리얼</div></div>
-<div class="side-item" data-idx="37"><div class="pg">p.126 · 스스로 해보기</div><div class="tt">포인터로 값 교환</div></div>
-<div class="side-item" data-idx="38"><div class="pg">p.127 · 작성 예</div><div class="tt">배열을 함수에 전달</div></div>
-<div class="side-item" data-idx="39"><div class="pg">p.130 · 작성 예</div><div class="tt">문자열 함수 활용</div></div>
-<div class="side-item" data-idx="40"><div class="pg">p.131 · 작성 예</div><div class="tt">포인터 반환 함수</div></div>
-<div class="side-item" data-idx="41"><div class="pg">p.132 · 스스로 해보기</div><div class="tt">제곱과 세제곱 함수</div></div>
-<div class="side-item" data-idx="42"><div class="pg">p.140 · 작성 예</div><div class="tt">파일 열기 닫기 확인</div></div>
-<div class="side-item" data-idx="43"><div class="pg">p.141 · 작성 예</div><div class="tt">텍스트 파일 쓰기</div></div>
-<div class="side-item" data-idx="44"><div class="pg">p.142 · 작성 예</div><div class="tt">텍스트 파일 읽기</div></div>
-<div class="side-item" data-idx="45"><div class="pg">p.143 · 작성 예</div><div class="tt">이진 파일 입출력</div></div>
-<div class="side-item" data-idx="46"><div class="pg">p.144 · 작성 예</div><div class="tt">파일 위치 제어</div></div>
-<div class="side-item" data-idx="47"><div class="pg">p.145 · 스스로 해보기</div><div class="tt">성적 파일 평균 구하기</div></div>
-<div class="side-item" data-idx="48"><div class="pg">p.146 · 작성 예</div><div class="tt">파일 복사 완성</div></div>
-<div class="side-item" data-idx="49"><div class="pg">p.147 · 스스로 해보기</div><div class="tt">로그 파일 이어쓰기</div></div>
-<div class="side-item" data-idx="50"><div class="pg">p.148 · 스스로 해보기</div><div class="tt">주소록 저장 종합</div></div>
+<div class="side-item active" data-idx="0"><div class="pg">수행연습</div><div class="tt">수행연습 1</div></div>
+<div class="side-item" data-idx="1"><div class="pg">수행연습</div><div class="tt">수행연습 2</div></div>
+<div class="side-item" data-idx="2"><div class="pg">p.65 · 작성 예</div><div class="tt">Hello World 출력</div></div>
+<div class="side-item" data-idx="3"><div class="pg">p.67 · 작성 예</div><div class="tt">변수 선언</div></div>
+<div class="side-item" data-idx="4"><div class="pg">p.68 · 작성 예</div><div class="tt">자료형 크기 확인</div></div>
+<div class="side-item" data-idx="5"><div class="pg">p.69 · 작성 예</div><div class="tt">변수 할당과 출력</div></div>
+<div class="side-item" data-idx="6"><div class="pg">p.72 · 작성 예</div><div class="tt">배열 기초 - 메달 집계</div></div>
+<div class="side-item" data-idx="7"><div class="pg">p.74 · 작성 예</div><div class="tt">2차원 배열 - 좌석 예약</div></div>
+<div class="side-item" data-idx="8"><div class="pg">p.77 · 작성 예</div><div class="tt">포인터와 배열</div></div>
+<div class="side-item" data-idx="9"><div class="pg">p.78 · 작성 예</div><div class="tt">두 변수 교환 swap</div></div>
+<div class="side-item" data-idx="10"><div class="pg">p.82 · 작성 예</div><div class="tt">printf 서식 지정자</div></div>
+<div class="side-item" data-idx="11"><div class="pg">p.83 · 작성 예</div><div class="tt">putchar, puts 함수</div></div>
+<div class="side-item" data-idx="12"><div class="pg">p.85 · 스스로 해보기</div><div class="tt">시간표 출력하기</div></div>
+<div class="side-item" data-idx="13"><div class="pg">p.86 · 작성 예</div><div class="tt">scanf 정수 입력</div></div>
+<div class="side-item" data-idx="14"><div class="pg">p.87 · 스스로 해보기</div><div class="tt">scanf 문자와 문자열</div></div>
+<div class="side-item" data-idx="15"><div class="pg">p.90 · 작성 예</div><div class="tt">산술 연산자</div></div>
+<div class="side-item" data-idx="16"><div class="pg">p.94 · 작성 예</div><div class="tt">파일 쓰기 fprintf</div></div>
+<div class="side-item" data-idx="17"><div class="pg">p.95 · 작성 예</div><div class="tt">파일 읽기 fscanf</div></div>
+<div class="side-item" data-idx="18"><div class="pg">p.96 · 작성 예</div><div class="tt">파일 복사 fgetc fputc</div></div>
+<div class="side-item" data-idx="19"><div class="pg">p.97 · 작성 예</div><div class="tt">줄 단위 입출력 fgets fputs</div></div>
+<div class="side-item" data-idx="20"><div class="pg">p.98 · 스스로 해보기</div><div class="tt">파일에 5줄 쓰기</div></div>
+<div class="side-item" data-idx="21"><div class="pg">p.104 · 작성 예</div><div class="tt">if문 홀짝 판별</div></div>
+<div class="side-item" data-idx="22"><div class="pg">p.105 · 작성 예</div><div class="tt">if-else 학점 계산</div></div>
+<div class="side-item" data-idx="23"><div class="pg">p.106 · 스스로 해보기</div><div class="tt">중첩 if 로그인</div></div>
+<div class="side-item" data-idx="24"><div class="pg">p.107 · 작성 예</div><div class="tt">switch 계절 판별</div></div>
+<div class="side-item" data-idx="25"><div class="pg">p.108 · 작성 예</div><div class="tt">switch 계산기</div></div>
+<div class="side-item" data-idx="26"><div class="pg">p.109 · 스스로 해보기</div><div class="tt">switch 메뉴 선택</div></div>
+<div class="side-item" data-idx="27"><div class="pg">p.110 · 작성 예</div><div class="tt">for문 구구단</div></div>
+<div class="side-item" data-idx="28"><div class="pg">p.111 · 작성 예</div><div class="tt">for문 별찍기</div></div>
+<div class="side-item" data-idx="29"><div class="pg">p.112 · 스스로 해보기</div><div class="tt">중첩 for 구구단 전체</div></div>
+<div class="side-item" data-idx="30"><div class="pg">p.113 · 작성 예</div><div class="tt">while 합계 구하기</div></div>
+<div class="side-item" data-idx="31"><div class="pg">p.114 · 작성 예</div><div class="tt">do-while 메뉴 반복</div></div>
+<div class="side-item" data-idx="32"><div class="pg">p.115 · 작성 예</div><div class="tt">break continue 활용</div></div>
+<div class="side-item" data-idx="33"><div class="pg">p.116 · 스스로 해보기</div><div class="tt">합이 100 넘는 순간</div></div>
+<div class="side-item" data-idx="34"><div class="pg">p.117 · 작성 예</div><div class="tt">중첩 반복문 좌표</div></div>
+<div class="side-item" data-idx="35"><div class="pg">p.118 · 스스로 해보기</div><div class="tt">무한루프와 q 탈출</div></div>
+<div class="side-item" data-idx="36"><div class="pg">p.121 · 작성 예</div><div class="tt">함수 정의와 호출</div></div>
+<div class="side-item" data-idx="37"><div class="pg">p.124 · 작성 예</div><div class="tt">매개변수와 반환값</div></div>
+<div class="side-item" data-idx="38"><div class="pg">p.125 · 작성 예</div><div class="tt">재귀함수 팩토리얼</div></div>
+<div class="side-item" data-idx="39"><div class="pg">p.126 · 스스로 해보기</div><div class="tt">포인터로 값 교환</div></div>
+<div class="side-item" data-idx="40"><div class="pg">p.127 · 작성 예</div><div class="tt">배열을 함수에 전달</div></div>
+<div class="side-item" data-idx="41"><div class="pg">p.130 · 작성 예</div><div class="tt">문자열 함수 활용</div></div>
+<div class="side-item" data-idx="42"><div class="pg">p.131 · 작성 예</div><div class="tt">포인터 반환 함수</div></div>
+<div class="side-item" data-idx="43"><div class="pg">p.132 · 스스로 해보기</div><div class="tt">제곱과 세제곱 함수</div></div>
+<div class="side-item" data-idx="44"><div class="pg">p.140 · 작성 예</div><div class="tt">파일 열기 닫기 확인</div></div>
+<div class="side-item" data-idx="45"><div class="pg">p.141 · 작성 예</div><div class="tt">텍스트 파일 쓰기</div></div>
+<div class="side-item" data-idx="46"><div class="pg">p.142 · 작성 예</div><div class="tt">텍스트 파일 읽기</div></div>
+<div class="side-item" data-idx="47"><div class="pg">p.143 · 작성 예</div><div class="tt">이진 파일 입출력</div></div>
+<div class="side-item" data-idx="48"><div class="pg">p.144 · 작성 예</div><div class="tt">파일 위치 제어</div></div>
+<div class="side-item" data-idx="49"><div class="pg">p.145 · 스스로 해보기</div><div class="tt">성적 파일 평균 구하기</div></div>
+<div class="side-item" data-idx="50"><div class="pg">p.146 · 작성 예</div><div class="tt">파일 복사 완성</div></div>
+<div class="side-item" data-idx="51"><div class="pg">p.147 · 스스로 해보기</div><div class="tt">로그 파일 이어쓰기</div></div>
+<div class="side-item" data-idx="52"><div class="pg">p.148 · 스스로 해보기</div><div class="tt">주소록 저장 종합</div></div>
 </div>
 
 <div class="main">
@@ -239,6 +241,8 @@ header{background:white;border-bottom:2px solid #e2e8f0;padding:12px 20px;displa
 
 <script>
 const lessons = [
+  {"page": "수행연습", "title": "수행연습 1", "type": "수행연습", "desc": "사칙연산 및 나누기 계산", "code": `#include <stdio.h>\nint main() {\n\tint num1, num2;\n\tint sum, diff, product;\n\tfloat div;\n\tprintf("첫 번째 수를 입력하세요: ");\n\tscanf("%d", &num1);\n\tprintf("두 번째 수를 입력하세요: ");\n\tscanf("%d", &num2);\n\tsum = num1 + num2;\n\tdiff = num1 - num2;\n\tproduct = num1 * num2;\n\tdiv = (float)num1 / num2;\n\t\n\tprintf ("[결과]\\n");\n\tprintf ("더하기: %d\\n", sum);\n\tprintf("빼기: %d\\n", diff);\n\tprintf("곱하기: %d\\n", product);\n\tprintf("나누기: %.2f\\n", div);\n\treturn 0;\n}`},
+  {"page": "수행연습", "title": "수행연습 2", "type": "수행연습", "desc": "삼항 연산자 최댓값 최솟값", "code": `#include <stdio.h>\nint main() {\n\tint a = 10;\n\tint b = 5;\n\tint max = (a > b) ? a : b;\n\tprintf("max: %d\\n", max);\n\tint min = (a < b) ? a : b;\n\tprintf("min: %d\\n", min);\n\treturn 0;\n}`},
   {"page": 65, "title": "Hello World 출력", "type": "작성 예", "desc": "첫 C 프로그램", "code": `#include <stdio.h>\nint main()\n{\n    printf("Hello, World! \\n");\n    return 0;\n}`},
   {"page": 67, "title": "변수 선언", "type": "작성 예", "desc": "정수형과 문자형 변수 선언", "code": `#include <stdio.h>\nint main()\n{\n    int num1;\n    int num2, num3;\n    char ch;\n    return 0;\n}`},
   {"page": 68, "title": "자료형 크기 확인", "type": "작성 예", "desc": "sizeof 연산자 활용", "code": `#include <stdio.h>\nint main()\n{\n    printf("1)정수형 int: %d, short: %d, long: %d \\n", sizeof(int), sizeof(short), sizeof(long));\n    printf("2)실수형 float: %d, double: %d \\n", sizeof(float), sizeof(double));\n    printf("3)문자형 char: %d \\n", sizeof(char));\n    return 0;\n}`},
@@ -533,7 +537,7 @@ function updateStats() {
 function renderAll() {
   const ls = lessons[curLessonIdx];
   document.getElementById('title').textContent = ls.title;
-  document.getElementById('pageBadge').textContent = 'p.' + ls.page;
+  document.getElementById('pageBadge').textContent = typeof ls.page === 'number' ? 'p.' + ls.page : ls.page;
   
   document.querySelectorAll('.side-item').forEach((el, i) => {
     el.classList.toggle('active', i === curLessonIdx);
